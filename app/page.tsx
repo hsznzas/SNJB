@@ -1,8 +1,9 @@
+// Use the default import (no curly braces)
 import SinjabLanding from '@/components/imported/SinjabLanding';
 
 export default function Page() {
   return (
-    <main className="min-h-screen bg-black">
+    <main>
       <SinjabLanding />
     </main>
   );
