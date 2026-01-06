@@ -1,54 +1,68 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { LineChart } from '@mui/x-charts/LineChart';
+import { 
+  Info, 
+  TrendingUp, 
+  Shield, 
+  Activity, 
+  DollarSign,
+  FileText,
+  Building2,
+  Code2,
+  Rocket,
+  Users,
+  ChevronRight,
+  Briefcase,
+  Scale,
+  Monitor,
+  Headphones,
+  UserCircle,
+  Building,
+  Target,
+  Cpu,
+  Crown,
+  AlertTriangle,
+  Construction,
+  Hourglass,
+  Coins,
+  TriangleAlert
+} from 'lucide-react';
 import { 
   DATA_2024, 
   DATA_2025, 
   DATA_CONSOLIDATED, 
-  BREAKDOWN_DATA, 
-  DEBT_BALANCE_HISTORY, 
+  DEBT_BALANCE_HISTORY,
+  DEBT_SCHEDULE, 
   LOAN_DETAILS,
   GMV_DATA,
-  GMV_SUMMARY,
   TAKE_RATE_DATA,
   TICKET_SIZE_DATA,
-  USER_TRACTION_DATA
+  USER_TRACTION_DATA,
+  EXPENSE_HISTORY_CONSOLIDATED,
+  LIABILITY_BREAKDOWN,
+  LIABILITY_TOTAL
 } from '@/data/dashboard-data';
-import { Info } from 'lucide-react';
-import { motion } from 'framer-motion';
 
-// ============================================
-// THEME CONFIGURATION - Edit colors here
-// ============================================
+// --- THEME CONFIGURATION (Light Mode) ---
 const THEME = {
   background: {
-    deepVoid: '#030014',
-    midnightBlue: '#0F0728',
-    cardGlass: 'rgba(0, 0, 0, 0.4)',
+    primary: '#fafbfc',
+    secondary: '#ffffff',
+    accent: '#f1f5f9',
   },
   accent: {
-    neonPurple: '#7C3AED',
-    cyan: '#00D2FF',
-    softPink: '#F472B6',
-  },
-  text: {
-    primary: '#FFFFFF',
-    secondary: '#94A3B8',
-  },
-  card: {
-    background: 'rgba(255, 255, 255, 0.03)',
-    border: 'rgba(255, 255, 255, 0.08)',
-    hoverShadow: '0 0 40px rgba(124, 58, 237, 0.3)',
-  },
-  chart: {
-    revenue: '#7C3AED',
-    expense: '#F472B6',
-    profit: '#00D2FF',
-    debt: '#FFA500',
-    tech: '#8B5CF6',
-    grid: 'rgba(148, 163, 184, 0.05)',
+    blue: '#2563eb',
+    purple: '#7c3aed',
+    green: '#059669',
+    orange: '#ea580c',
+    red: '#dc2626',
+    yellow: '#ca8a04',
+    text: '#0f172a',
+    textSecondary: '#64748b',
   }
 };
 
@@ -61,587 +75,1028 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-// Chart metadata for tooltips
-const CHART_INFO = {
-  performance: {
-    calculation: "Revenue - Expenses = Net Margin",
-    source: "Stripe API + Internal Ledger"
-  },
-  gmv: {
-    calculation: "Sum of all booking values (Gross)",
-    source: "Booking Engine Database"
-  },
-  userTraction: {
-    calculation: "New Signups + Active Users + Capacity %",
-    source: "User Analytics Platform"
-  },
-  bookingVolume: {
-    calculation: "Count of completed bookings",
-    source: "Booking Engine Database"
-  },
-  ticketSize: {
-    calculation: "Average Booking Value (GMV / Bookings)",
-    source: "Booking Engine Database"
-  },
-  unitEconomics: {
-    calculation: "Take Rate - Payment Gateway Fees",
-    source: "Stripe + Internal Calculations"
-  },
-  expenses: {
-    calculation: "Payroll + Tech Stack + Operations",
-    source: "Quickbooks + Cloud Billing"
-  },
-  debt: {
-    calculation: "Principal Balance Over Time",
-    source: "Bank Statements"
-  }
-};
-
-// Common Chart Styles - Minimalist Mixpanel Style
+// Common props for MUI Charts - Light Mode
 const commonChartProps = {
   grid: { horizontal: true },
-  margin: { top: 20, bottom: 40, left: 100, right: 20 },
-  slotProps: { 
-    legend: { 
-      labelStyle: { fontSize: 12, fill: THEME.text.secondary },
-      itemMarkWidth: 10,
-      itemMarkHeight: 10,
-    } as any
-  },
+  margin: { top: 30, bottom: 40, left: 80, right: 30 },
   sx: {
-    '.MuiChartsLegend-root text': { fill: `${THEME.text.secondary} !important` }, 
-    '.MuiChartsLegend-series text': { fill: `${THEME.text.secondary} !important` }, 
-    '.MuiChartsAxis-tickLabel': { fill: `${THEME.text.secondary} !important`, fontSize: 11 },
-    '.MuiChartsAxis-line': { stroke: `${THEME.chart.grid} !important`, strokeOpacity: 0.5 },
-    '.MuiChartsAxis-tick': { stroke: `${THEME.chart.grid} !important`, strokeOpacity: 0.3 },
-    '.MuiChartsGrid-line': { stroke: `${THEME.chart.grid} !important`, strokeOpacity: 1 },
+    '.MuiChartsLegend-root text': { fill: `${THEME.accent.textSecondary} !important`, fontSize: 11 }, 
+    '.MuiChartsAxis-tickLabel': { fill: `${THEME.accent.textSecondary} !important`, fontSize: 10 },
+    '.MuiChartsAxis-line': { stroke: 'rgba(0,0,0,0.1) !important' },
+    '.MuiChartsAxis-tick': { stroke: 'rgba(0,0,0,0.1) !important' },
+    '.MuiChartsGrid-line': { stroke: 'rgba(0,0,0,0.05) !important' },
   }
 };
 
-// Info Tooltip Component
-function InfoTooltip({ info }: { info: { calculation: string; source: string } }) {
-  const [isOpen, setIsOpen] = useState(false);
+// Updated Data Sources - Hyper-specific references
+const CHART_INFO = {
+  performance: { 
+    calculation: "Revenue - Operating Expenses = Net Margin", 
+    source: "Source: Internal Financial Statement 2024 & P&L Ledger." 
+  },
+  gmv: { 
+    calculation: "Gross Transaction Value (Sum of all completed bookings)", 
+    source: "Source: Excel File - 'Al Rajhi Bank Statement' (Credit Column Analysis)." 
+  },
+  userTraction: { 
+    calculation: "New User Registrations vs Monthly Active Users", 
+    source: "Source: Excel File - 'Sinjab Daily Bookings Report' (Confirmed Bookings Count)." 
+  },
+  unitEconomics: { 
+    calculation: "Gross Revenue (4.9% Take Rate) minus Payment Processing Costs", 
+    source: "Source: Excel File - 'Al Rajhi Bank Statement' (Credit Column Analysis)." 
+  },
+  debt: { 
+    calculation: "Outstanding Principal Balance after scheduled repayments", 
+    source: "Source: Internal Financial Statement 2024 & P&L Ledger." 
+  },
+  bookings: { 
+    calculation: "Total confirmed court bookings per period", 
+    source: "Source: Excel File - 'Sinjab Daily Bookings Report' (Confirmed Bookings Count)." 
+  },
+  ticket: { 
+    calculation: "GMV ÷ Total Bookings = Average Transaction Value", 
+    source: "Source: Computed from Bank Statement & Booking Report data." 
+  },
+  expenses: { 
+    calculation: "Payroll + Technology + Operations = Total Burn", 
+    source: "Source: Internal Financial Statement 2024 & P&L Ledger." 
+  }
+};
 
+// Navigation items
+const NAV_ITEMS = [
+  { id: 'introduction', label: 'Introduction', icon: FileText },
+  { id: 'financial', label: 'Financial Performance', icon: TrendingUp },
+  { id: 'organization', label: 'Organizational Structure', icon: Building2 },
+  { id: 'tech', label: 'Tech Architecture', icon: Code2 },
+  { id: 'roadmap', label: 'Road to Profitability', icon: Rocket },
+  { id: 'projections', label: 'Future Projections', icon: Hourglass },
+];
+
+// --- COMPONENTS ---
+
+const InfoTooltip = ({ info }: { info: { calculation: string; source: string } }) => {
+  const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="relative inline-block ml-2">
-      <button
-        onMouseEnter={() => setIsOpen(true)}
-        onMouseLeave={() => setIsOpen(false)}
-        onClick={() => setIsOpen(!isOpen)}
-        className="text-purple-400 hover:text-cyan-400 transition-colors"
-        aria-label="Info"
+    <div className="relative inline-block ml-2 z-50">
+      <button 
+        onMouseEnter={() => setIsOpen(true)} 
+        onMouseLeave={() => setIsOpen(false)} 
+        className="text-slate-400 hover:text-blue-600 transition-colors"
       >
         <Info className="w-4 h-4" />
       </button>
-      
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute left-0 top-full mt-2 z-50 w-72 p-4 rounded-2xl border backdrop-blur-xl"
-          style={{
-            background: 'rgba(15, 7, 40, 0.95)',
-            borderColor: THEME.card.border,
-            boxShadow: '0 20px 60px rgba(124, 58, 237, 0.4)',
-          }}
-        >
-          <div className="space-y-3">
-            <div>
-              <div className="text-xs font-bold text-purple-300 uppercase tracking-wider mb-1">
-                Calculation
-              </div>
-              <div className="text-sm text-white font-mono">
-                {info.calculation}
-              </div>
-            </div>
-            <div className="h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
-            <div>
-              <div className="text-xs font-bold text-cyan-300 uppercase tracking-wider mb-1">
-                Source
-              </div>
-              <div className="text-sm text-gray-300">
-                {info.source}
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: 5 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            exit={{ opacity: 0, y: 5 }} 
+            className="absolute left-0 bottom-full mb-2 w-72 p-4 rounded-xl bg-white border border-slate-200 text-xs shadow-xl z-[100]"
+          >
+            <div className="font-bold text-blue-600 mb-1">Calculation Method</div>
+            <div className="text-slate-600 mb-3">{info.calculation}</div>
+            <div className="font-bold text-emerald-600 mb-1">Data Source</div>
+            <div className="text-slate-500 text-[11px] leading-relaxed">{info.source}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
-}
+};
 
-export default function FinancialDashboard() {
-  const [view, setView] = useState<2024 | 2025 | 'consolidated'>('consolidated');
-  
-  let currentData;
-  if (view === 'consolidated') currentData = DATA_CONSOLIDATED;
-  else if (view === 2025) currentData = DATA_2025;
-  else currentData = DATA_2024;
-
-  const breakdown = BREAKDOWN_DATA[view] || BREAKDOWN_DATA['consolidated'];
-
-  const validMonths = (currentData || []).filter(d => d.revenue !== null);
-  const totalRev = validMonths.reduce((acc, curr) => acc + (curr.revenue || 0), 0);
-  const totalExp = validMonths.reduce((acc, curr) => acc + (curr.expenses || 0), 0);
-  const netMargin = totalRev - totalExp;
-
+const Sidebar = ({ activeSection }: { activeSection: string }) => {
   return (
-    <div 
-      className="min-h-screen text-white p-4 md:p-12 font-sans relative overflow-x-hidden"
-      style={{
-        background: `linear-gradient(180deg, ${THEME.background.deepVoid} 0%, ${THEME.background.midnightBlue} 100%)`,
-        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
-      }}
+    <motion.aside 
+      initial={{ x: -100, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      className="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-white/80 backdrop-blur-xl border-r border-slate-200 flex-col py-8 px-4 z-40"
     >
-      {/* Dot Grid Background */}
-      <div 
-        className="fixed inset-0 pointer-events-none"
-        style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(124, 58, 237, 0.15) 1px, transparent 0)`,
-          backgroundSize: '40px 40px',
-          maskImage: 'radial-gradient(ellipse at center, black 20%, transparent 70%)',
-          WebkitMaskImage: 'radial-gradient(ellipse at center, black 20%, transparent 70%)',
-        }}
-      />
+      <div className="mb-10 px-4">
+        <div className="text-2xl font-black text-slate-900">Sinjab</div>
+        <div className="text-xs text-slate-500 uppercase tracking-widest mt-1">Investor Portal</div>
+      </div>
       
-      {/* Glowing Orb */}
-      <div 
-        className="fixed top-0 left-1/2 -translate-x-1/2 pointer-events-none"
-        style={{
-          width: '800px',
-          height: '800px',
-          background: `radial-gradient(circle, ${THEME.accent.neonPurple}30 0%, transparent 70%)`,
-          filter: 'blur(80px)',
-          opacity: 0.4,
-        }}
-      />
-
-      {/* Custom Scrollbar Styles */}
-      <style jsx global>{`
-        ::-webkit-scrollbar {
-          width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-          background: ${THEME.background.deepVoid};
-        }
-        ::-webkit-scrollbar-thumb {
-          background: linear-gradient(180deg, ${THEME.accent.neonPurple} 0%, ${THEME.accent.cyan} 100%);
-          border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-          background: ${THEME.accent.neonPurple};
-        }
-      `}</style>
-
-      {/* Content Container */}
-      <div className="max-w-7xl mx-auto relative z-10">
-        {/* GRADIENTS */}
-        <svg height={0} width={0}>
-          <defs>
-            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={THEME.chart.revenue} stopOpacity={0.8}/>
-              <stop offset="95%" stopColor={THEME.chart.revenue} stopOpacity={0.2}/>
-            </linearGradient>
-            <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={THEME.chart.expense} stopOpacity={0.8}/>
-              <stop offset="95%" stopColor={THEME.chart.expense} stopOpacity={0.2}/>
-            </linearGradient>
-            <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={THEME.chart.profit} stopOpacity={0.8}/>
-              <stop offset="95%" stopColor={THEME.chart.profit} stopOpacity={0.2}/>
-            </linearGradient>
-            <linearGradient id="colorDebt" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={THEME.chart.debt} stopOpacity={0.8}/>
-              <stop offset="95%" stopColor={THEME.chart.debt} stopOpacity={0.2}/>
-            </linearGradient>
-            <linearGradient id="colorTech" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={THEME.chart.tech} stopOpacity={0.8}/>
-              <stop offset="95%" stopColor={THEME.chart.tech} stopOpacity={0.2}/>
-            </linearGradient>
-          </defs>
-        </svg>
-
-        {/* TOP BAR */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
-          <div>
-            <h1 
-              className="text-5xl font-black mb-2"
-              style={{ 
-                background: `linear-gradient(135deg, ${THEME.text.primary} 0%, ${THEME.accent.cyan} 100%)`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
+      <nav className="flex-1 space-y-1">
+        {NAV_ITEMS.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeSection === item.id;
+          return (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                isActive 
+                  ? 'bg-blue-50 text-blue-700 font-semibold' 
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+              }`}
             >
-              Financial Analytics
-            </h1>
-            <p className="text-lg" style={{ color: THEME.text.secondary }}>
-              Real-time insights • Operational intelligence
-            </p>
-          </div>
-          <div 
-            className="p-1.5 rounded-2xl border flex gap-1.5 backdrop-blur-xl"
-            style={{
-              background: THEME.card.background,
-              borderColor: THEME.card.border,
-            }}
-          >
-            {[2024, 2025].map((y) => (
-              <button
-                key={y}
-                onClick={() => setView(y as 2024 | 2025)}
-                className="px-6 py-3 rounded-xl text-sm font-bold transition-all"
-                style={{
-                  background: view === y ? THEME.accent.neonPurple : 'transparent',
-                  color: view === y ? THEME.text.primary : THEME.text.secondary,
-                  boxShadow: view === y ? `0 8px 32px ${THEME.accent.neonPurple}50` : 'none',
-                }}
-              >
-                {y}
-              </button>
-            ))}
-            <button
-              onClick={() => setView('consolidated')}
-              className="px-6 py-3 rounded-xl text-sm font-bold transition-all"
-              style={{
-                background: view === 'consolidated' ? THEME.accent.cyan : 'transparent',
-                color: view === 'consolidated' ? THEME.text.primary : THEME.text.secondary,
-                boxShadow: view === 'consolidated' ? `0 8px 32px ${THEME.accent.cyan}50` : 'none',
-              }}
-            >
-              All Time
-            </button>
-          </div>
+              <Icon className={`w-5 h-5 ${isActive ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-600'}`} />
+              <span className="text-sm">{item.label}</span>
+              {isActive && (
+                <ChevronRight className="w-4 h-4 ml-auto text-blue-500" />
+              )}
+            </a>
+          );
+        })}
+      </nav>
+      
+      <div className="px-4 pt-6 border-t border-slate-100">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+          <span className="text-xs text-slate-500">Live Data Feed</span>
         </div>
+      </div>
+    </motion.aside>
+  );
+};
 
-        {/* HEADER STATS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          <StatCard 
-            label="Total Revenue" 
-            value={formatCurrency(totalRev)} 
-            sub="Actuals" 
-            accentColor={THEME.accent.neonPurple} 
-          />
-          <StatCard 
-            label="Total Expenses" 
-            value={formatCurrency(totalExp)} 
-            sub="Actuals" 
-            accentColor={THEME.chart.expense} 
-          />
-          <StatCard 
-            label="Net Margin" 
-            value={formatCurrency(netMargin)} 
-            sub={netMargin > 0 ? "Profitable" : "Burn Zone"} 
-            accentColor={netMargin > 0 ? THEME.chart.profit : THEME.chart.debt} 
-          />
-          <StatCard 
-            label="Cash Runway" 
-            value={view === 2025 ? "Stabilizing" : "Critical"} 
-            sub="Status" 
-            accentColor={THEME.accent.cyan} 
+const ChartCard = ({ title, info, children, className = "" }: { 
+  title: string; 
+  info?: { calculation: string; source: string }; 
+  children: React.ReactNode; 
+  className?: string 
+}) => (
+  <motion.div 
+    initial={{ opacity: 0, y: 20 }} 
+    whileInView={{ opacity: 1, y: 0 }} 
+    viewport={{ once: true }}
+    className={`bg-white/70 backdrop-blur-sm border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:border-slate-300 transition-all ${className}`}
+  >
+    <div className="flex items-center justify-between mb-6">
+      <h3 className="text-base font-bold text-slate-900 flex items-center">
+        {title} 
+        {info && <InfoTooltip info={info} />}
+      </h3>
+    </div>
+    {children}
+  </motion.div>
+);
+
+const StatCard = ({ label, value, sub, icon: Icon, color }: { 
+  label: string; 
+  value: string; 
+  sub: string; 
+  icon: any; 
+  color: string 
+}) => (
+  <motion.div 
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    className="bg-white/70 backdrop-blur-sm p-5 rounded-xl border border-slate-200 flex flex-col gap-3 hover:shadow-md hover:border-slate-300 transition-all"
+  >
+    <div className="flex justify-between items-start">
+      <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{label}</div>
+      <Icon className="w-5 h-5" style={{ color }} />
+    </div>
+    <div>
+      <div className="text-2xl font-black text-slate-900">{value}</div>
+      <div className="text-xs text-slate-400 mt-1">{sub}</div>
+    </div>
+  </motion.div>
+);
+
+const SectionHeader = ({ title, subtitle, id }: { title: string; subtitle: string; id: string }) => (
+  <div id={id} className="scroll-mt-24 mb-10">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+    >
+      <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-2">{title}</h2>
+      <p className="text-slate-500 text-lg">{subtitle}</p>
+    </motion.div>
+  </div>
+);
+
+// --- ORG CHART COMPONENTS ---
+
+const OrgNode = ({ 
+  title, 
+  name, 
+  badge, 
+  icon: Icon, 
+  color = "blue",
+  subtitle,
+  children 
+}: { 
+  title: string; 
+  name?: string; 
+  badge?: string; 
+  icon: any; 
+  color?: string;
+  subtitle?: string;
+  children?: React.ReactNode;
+}) => {
+  const colorClasses: Record<string, string> = {
+    blue: 'bg-blue-50 border-blue-200 text-blue-700',
+    purple: 'bg-purple-50 border-purple-200 text-purple-700',
+    green: 'bg-emerald-50 border-emerald-200 text-emerald-700',
+    orange: 'bg-orange-50 border-orange-200 text-orange-700',
+    slate: 'bg-slate-50 border-slate-200 text-slate-700',
+    amber: 'bg-amber-50 border-amber-200 text-amber-700',
+  };
+  
+  return (
+    <div className="flex flex-col items-center">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        className={`relative p-4 rounded-xl border-2 ${colorClasses[color]} min-w-[160px] text-center`}
+      >
+        <Icon className="w-6 h-6 mx-auto mb-2 opacity-60" />
+        <div className="font-bold text-sm">{title}</div>
+        {name && <div className="text-xs opacity-70 mt-1">{name}</div>}
+        {subtitle && <div className="text-[10px] opacity-50 mt-1">{subtitle}</div>}
+        {badge && (
+          <span className="absolute -top-2 -right-2 bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+            {badge}
+          </span>
+        )}
+      </motion.div>
+      {children}
+    </div>
+  );
+};
+
+const OrgConnector = ({ type = 'vertical' }: { type?: 'vertical' | 'horizontal' }) => (
+  <div className={`${type === 'vertical' ? 'w-0.5 h-8 mx-auto' : 'h-0.5 w-8'} bg-slate-300`} />
+);
+
+const OrganizationChart = () => (
+  <div className="overflow-x-auto py-8">
+    <div className="flex flex-col items-center min-w-[800px]">
+      {/* CEO Level */}
+      <OrgNode title="CEO" name="Hassan" icon={Crown} color="amber" />
+      <OrgConnector />
+      
+      {/* Level 2 - Departments */}
+      <div className="flex items-start gap-4 relative">
+        {/* Horizontal connector line */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[calc(100%-80px)] h-0.5 bg-slate-300" />
+        
+        {/* Finance */}
+        <div className="flex flex-col items-center pt-8">
+          <div className="w-0.5 h-8 bg-slate-300 -mt-8" />
+          <OrgNode 
+            title="Finance & HR" 
+            name="Omar" 
+            icon={Briefcase} 
+            color="blue"
+            subtitle="4 Employees"
           />
         </div>
-
-        {/* ==================== SECTION: PERFORMANCE OVERVIEW ==================== */}
-        <SectionDivider />
-        <div 
-          className="rounded-3xl p-8 mb-16 relative overflow-hidden backdrop-blur-xl border transition-all duration-300 hover:shadow-2xl"
-          style={{
-            background: THEME.card.background,
-            borderColor: THEME.card.border,
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.boxShadow = THEME.card.hoverShadow}
-          onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
-        >
-          <h3 className="text-2xl font-bold mb-6 flex items-center text-white">
-            Performance Trends {view === 'consolidated' ? '(2023 - 2025)' : `(${view})`}
-            <InfoTooltip info={CHART_INFO.performance} />
-          </h3>
-          <div className="w-full h-[400px]">
-            <BarChart
-              dataset={currentData}
-              xAxis={[{ 
-                scaleType: 'band', 
-                dataKey: 'month', 
-                tickLabelStyle: { fill: THEME.text.secondary, fontSize: view === 'consolidated' ? 10 : 12 } 
-              }]}
-              series={[
-                { dataKey: 'revenue', label: 'Revenue', color: 'url(#colorRevenue)', stack: 'A' },
-                { dataKey: 'expenses', label: 'Expenses', color: 'url(#colorExpense)', stack: 'B' },
-              ]}
-              yAxis={[{ tickLabelStyle: { fill: THEME.text.secondary } }]}
-              {...commonChartProps}
-            />
-          </div>
+        
+        {/* Legal */}
+        <div className="flex flex-col items-center pt-8">
+          <div className="w-0.5 h-8 bg-slate-300 -mt-8" />
+          <OrgNode 
+            title="Legal" 
+            name="MZ Lawyers" 
+            icon={Scale} 
+            color="purple"
+            badge="2% Equity"
+          />
         </div>
-
-        {/* ==================== SECTION: BUSINESS HEALTH ==================== */}
-        <SectionDivider />
-        <div className="mb-16">
-          {/* GMV Overview */}
-          <ChartCard title="Gross Merchandise Value (GMV)" info={CHART_INFO.gmv}>
-            <div className="flex flex-col lg:flex-row gap-8">
-              <div className="flex-1 overflow-x-auto">
-                <div className="h-[350px] min-w-[900px]">
-                  <BarChart
-                    dataset={GMV_DATA}
-                    xAxis={[{ scaleType: 'band', dataKey: 'month', tickLabelStyle: { fill: THEME.text.secondary, fontSize: 9, angle: -45, textAnchor: 'end' } }]}
-                    series={[{ dataKey: 'gmv', label: 'GMV (SAR)', color: 'url(#colorProfit)' }]}
-                    yAxis={[{ tickLabelStyle: { fill: THEME.text.secondary } }]}
-                    {...commonChartProps}
-                  />
-                </div>
-              </div>
-              <div className="w-full lg:w-[280px] space-y-3">
-                {Object.entries(GMV_SUMMARY).map(([yr, data]: any) => (
-                  <div 
-                    key={yr} 
-                    className="p-4 rounded-2xl border backdrop-blur-sm"
-                    style={{
-                      background: `${THEME.chart.profit}15`,
-                      borderColor: `${THEME.chart.profit}30`,
-                    }}
+        
+        {/* Tech */}
+        <div className="flex flex-col items-center pt-8">
+          <div className="w-0.5 h-8 bg-slate-300 -mt-8" />
+          <OrgNode 
+            title="Tech / Dev" 
+            name="NextGeni" 
+            icon={Monitor} 
+            color="green"
+            badge="Partner"
+          />
+        </div>
+        
+        {/* Operations */}
+        <div className="flex flex-col items-center pt-8">
+          <div className="w-0.5 h-8 bg-slate-300 -mt-8" />
+          <OrgNode 
+            title="Operations" 
+            icon={Building} 
+            color="orange"
+            badge="Vacant"
+          />
+          <OrgConnector />
+          
+          {/* Sub-departments */}
+          <div className="flex gap-4 relative">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[calc(100%-40px)] h-0.5 bg-slate-300" />
+            
+            {/* Sales */}
+            <div className="flex flex-col items-center pt-8">
+              <div className="w-0.5 h-8 bg-slate-300 -mt-8" />
+              <OrgNode 
+                title="Sales" 
+                name="Mansour" 
+                icon={Users} 
+                color="slate"
+                subtitle="Saudi National"
+              />
+            </div>
+            
+            {/* CS */}
+            <div className="flex flex-col items-center pt-8">
+              <div className="w-0.5 h-8 bg-slate-300 -mt-8" />
+              <OrgNode 
+                title="Customer Success" 
+                name="Faris (Remote)" 
+                icon={Headphones} 
+                color="slate"
+              />
+              <OrgConnector />
+              <div className="flex gap-2">
+                {[1, 2, 3].map((i) => (
+                  <motion.div 
+                    key={i}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center"
                   >
-                    <div className="text-xs uppercase font-bold" style={{ color: THEME.chart.profit }}>
-                      {yr} ({data.label})
-                    </div>
-                    <div className="text-2xl font-black mt-1 text-white">{data.total}</div>
-                  </div>
+                    <UserCircle className="w-5 h-5 text-slate-400" />
+                  </motion.div>
+                ))}
+              </div>
+              <div className="text-[10px] text-slate-400 mt-2">3 Remote Agents</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// --- ROADMAP COMPONENTS ---
+
+const MILESTONES = [
+  {
+    id: 'consolidation',
+    title: 'Market Consolidation',
+    subtitle: 'Strategic Mergers',
+    description: 'Merging with competitors and market leaders to expand our court network and user base across the Kingdom.',
+    impact: '+25% Revenue (Conservative)',
+    icon: Building2,
+    color: 'blue',
+    status: 'in-progress'
+  },
+  {
+    id: 'b2b',
+    title: 'B2B Vertical',
+    subtitle: 'Corporate Access Program',
+    description: 'Opening gate access for corporate partners to offer court bookings as employee benefits and wellness programs.',
+    partners: ['Noon', 'Roshn', 'Aramco', 'Webook', 'Wafy', 'STC Bank', 'Walaa', 'AlAhli Bank', 'AlRajhi Bank'],
+    icon: Briefcase,
+    color: 'purple',
+    status: 'planned'
+  },
+  {
+    id: 'pricing',
+    title: 'Organized Match Monetization',
+    subtitle: 'Platform Fee Revenue',
+    description: 'Monetizing Organized Matches. Implementation of a 5 SAR Platform Fee per player for every match organized via Sinjab.',
+    impact: 'New Revenue Stream per Match',
+    icon: Cpu,
+    color: 'green',
+    status: 'planned'
+  },
+  {
+    id: 'yield',
+    title: 'Upfront Yield Model',
+    subtitle: 'Inventory Pre-Purchase',
+    description: 'Pre-purchasing club inventory for guaranteed liquidity in exchange for 100% booking revenue retention.',
+    impact: '+30% Profit Margin Increase',
+    icon: Coins,
+    color: 'amber',
+    status: 'planned'
+  }
+];
+
+const MilestoneCard = ({ milestone, index }: { milestone: typeof MILESTONES[0]; index: number }) => {
+  const Icon = milestone.icon;
+  const colorClasses: Record<string, { bg: string; border: string; icon: string; badge: string }> = {
+    blue: { bg: 'bg-blue-50', border: 'border-blue-200', icon: 'text-blue-600', badge: 'bg-blue-100 text-blue-700' },
+    purple: { bg: 'bg-purple-50', border: 'border-purple-200', icon: 'text-purple-600', badge: 'bg-purple-100 text-purple-700' },
+    green: { bg: 'bg-emerald-50', border: 'border-emerald-200', icon: 'text-emerald-600', badge: 'bg-emerald-100 text-emerald-700' },
+    amber: { bg: 'bg-amber-50', border: 'border-amber-200', icon: 'text-amber-600', badge: 'bg-amber-100 text-amber-700' },
+  };
+  const colors = colorClasses[milestone.color];
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -30 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.15 }}
+      className="relative flex gap-6"
+    >
+      {/* Timeline connector */}
+      <div className="flex flex-col items-center">
+        <div className={`w-12 h-12 rounded-xl ${colors.bg} ${colors.border} border-2 flex items-center justify-center relative z-10`}>
+          <Icon className={`w-6 h-6 ${colors.icon}`} />
+        </div>
+        {index < MILESTONES.length - 1 && (
+          <div className="w-0.5 h-full bg-slate-200 absolute top-12 left-6" />
+        )}
+      </div>
+      
+      {/* Content */}
+      <div className={`flex-1 pb-12 ${index === MILESTONES.length - 1 ? 'pb-0' : ''}`}>
+        <div className="bg-white/70 backdrop-blur-sm border border-slate-200 rounded-xl p-6 hover:shadow-md transition-all">
+          <div className="flex items-start justify-between mb-3">
+            <div>
+              <h4 className="font-bold text-slate-900 text-lg">{milestone.title}</h4>
+              <p className="text-sm text-slate-500">{milestone.subtitle}</p>
+            </div>
+            <span className={`text-xs font-semibold px-3 py-1 rounded-full ${colors.badge}`}>
+              {milestone.status === 'in-progress' ? 'In Progress' : 'Planned'}
+            </span>
+          </div>
+          
+          <p className="text-slate-600 text-sm mb-4">{milestone.description}</p>
+          
+          {milestone.impact && (
+            <div className="flex items-center gap-2 text-sm">
+              <Target className="w-4 h-4 text-emerald-600" />
+              <span className="font-semibold text-emerald-700">{milestone.impact}</span>
+            </div>
+          )}
+          
+          {milestone.partners && (
+            <div className="mt-4">
+              <div className="text-xs text-slate-500 mb-2 font-medium">Target Partners:</div>
+              <div className="flex flex-wrap gap-2">
+                {milestone.partners.map((partner) => (
+                  <span key={partner} className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-md font-medium">
+                    {partner}
+                  </span>
                 ))}
               </div>
             </div>
-          </ChartCard>
-
-          {/* USER GROWTH & UTILIZATION */}
-          <ChartCard title="User Traction & Utilization" subtitle="New acquisition, active retention, and capacity utilization" info={CHART_INFO.userTraction}>
-            <div className="h-[400px] w-full overflow-x-auto">
-              <div className="min-w-[900px] h-full">
-                <LineChart
-                  dataset={USER_TRACTION_DATA}
-                  xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.text.secondary, fontSize: 10 } }]}
-                  series={[
-                    { dataKey: 'newUsers', label: 'New Players', color: THEME.accent.cyan, showMark: false, area: true },
-                    { dataKey: 'activeUsers', label: 'Active/Returning', color: THEME.chart.revenue, showMark: false, area: true },
-                    { dataKey: 'utilization', label: 'Utilization %', color: THEME.chart.debt, yAxisId: 'rightAxis', showMark: false } as any,
-                  ]}
-                  yAxis={[
-                    { id: 'leftAxis', tickLabelStyle: { fill: THEME.text.secondary } },
-                    { id: 'rightAxis', position: 'right', tickLabelStyle: { fill: THEME.chart.debt }, min: 0, max: 100 } as any
-                  ]}
-                  {...commonChartProps}
-                />
-              </div>
-            </div>
-          </ChartCard>
-
-          {/* Booking Volume + Ticket Size */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <ChartCard title="Booking Volume" info={CHART_INFO.bookingVolume}>
-              <div className="h-[300px] w-full">
-                <BarChart
-                  dataset={GMV_DATA}
-                  xAxis={[{ scaleType: 'band', dataKey: 'month', tickLabelStyle: { fill: THEME.text.secondary, fontSize: 10 } }]}
-                  series={[{ dataKey: 'bookings', label: 'Count', color: 'url(#colorTech)' }]}
-                  yAxis={[{ tickLabelStyle: { fill: THEME.text.secondary } }]}
-                  {...commonChartProps}
-                />
-              </div>
-            </ChartCard>
-            <ChartCard title="Avg. Ticket Size" info={CHART_INFO.ticketSize}>
-              <div className="h-[300px] w-full">
-                <LineChart
-                  dataset={TICKET_SIZE_DATA}
-                  xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.text.secondary, fontSize: 10 } }]}
-                  series={[{ dataKey: 'ticket', label: 'SAR / Booking', color: THEME.chart.debt, area: true, showMark: false }]}
-                  yAxis={[{ tickLabelStyle: { fill: THEME.text.secondary } }]}
-                  {...commonChartProps}
-                />
-              </div>
-            </ChartCard>
-          </div>
-
-          {/* Unit Economics */}
-          <ChartCard title="Unit Economics: Revenue vs Cost" info={CHART_INFO.unitEconomics}>
-            <div className="h-[350px] w-full">
-              <LineChart
-                dataset={TAKE_RATE_DATA}
-                xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.text.secondary, fontSize: 10 } }]}
-                series={[
-                  { dataKey: 'grossRevenue', label: 'Gross Revenue (Take Rate)', color: THEME.chart.revenue, showMark: false },
-                  { dataKey: 'costOfRevenue', label: 'Gateway Cost', color: THEME.chart.expense, showMark: false },
-                  { dataKey: 'netRevenue', label: 'Net Profit Spread', color: THEME.chart.profit, area: true, showMark: false },
-                ]}
-                yAxis={[{ tickLabelStyle: { fill: THEME.text.secondary } }]}
-                {...commonChartProps}
-              />
-            </div>
-          </ChartCard>
+          )}
         </div>
+      </div>
+    </motion.div>
+  );
+};
 
-        {/* ==================== SECTION: EXPENSES ==================== */}
-        <SectionDivider />
-        <ChartCard title="Cost Breakdown (Payroll vs Tech vs Ops)" info={CHART_INFO.expenses} className="mb-16">
-          <div className="h-[400px] w-full">
-            <LineChart
-              dataset={'chartData' in breakdown.expenses ? breakdown.expenses.chartData : []}
-              xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.text.secondary, fontSize: 10 } }]}
-              series={[
-                { dataKey: 'payroll', label: 'Payroll', color: THEME.accent.cyan, showMark: false, curve: 'linear' },
-                { dataKey: 'tech', label: 'Tech', color: THEME.chart.tech, showMark: false, curve: 'linear' },
-                { dataKey: 'ops', label: 'Ops', color: THEME.chart.debt, showMark: false, curve: 'linear' },
-              ]}
-              yAxis={[{ tickLabelStyle: { fill: THEME.text.secondary } }]}
-              {...commonChartProps}
-            />
-          </div>
-        </ChartCard>
+// --- INDIRECT COSTS DATA ---
+const INDIRECT_COSTS = [
+  { role: 'CEO', name: 'Hassan', cost: 20000 },
+  { role: 'COO (Head of Ops)', name: 'Vacant', cost: 15000 },
+  { role: 'Sales', name: 'Mansour', cost: 10000 },
+  { role: 'CS Lead', name: 'Faris', cost: 7500 },
+  { role: 'CS Agent #1', name: 'Remote', cost: 4500 },
+  { role: 'CS Agent #2', name: 'Remote', cost: 4500 },
+  { role: 'CS Agent #3', name: 'Remote', cost: 4500 },
+];
 
-        {/* ==================== SECTION: DEBT ==================== */}
-        <SectionDivider />
-        <ChartCard title="Debt Management" info={CHART_INFO.debt} className="mb-16">
-          <div className="flex flex-col lg:flex-row gap-8">
-            <div className="flex-1">
-              <h4 className="text-lg font-bold mb-4" style={{ color: THEME.text.primary }}>
-                Debt Trajectory
-              </h4>
-              <div className="h-[300px] w-full">
-                <LineChart
-                  dataset={DEBT_BALANCE_HISTORY}
-                  xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.text.secondary, fontSize: 10 } }]}
-                  series={[{ dataKey: 'balance', label: 'Principal', color: THEME.chart.debt, area: true, showMark: true }]}
-                  yAxis={[{ tickLabelStyle: { fill: THEME.text.secondary } }]}
-                  {...commonChartProps}
-                />
+// --- MAIN COMPONENT ---
+
+export default function InvestorRelations() {
+  const [activeSection, setActiveSection] = useState('introduction');
+  const [view, setView] = useState<2024 | 2025 | 'all'>(2025);
+  
+  // Scroll tracking
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = NAV_ITEMS.map(item => document.getElementById(item.id));
+      const scrollPosition = window.scrollY + 200;
+      
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = sections[i];
+        if (section && section.offsetTop <= scrollPosition) {
+          setActiveSection(NAV_ITEMS[i].id);
+          break;
+        }
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  
+  const currentData = view === 'all' ? DATA_CONSOLIDATED : (view === 2025 ? DATA_2025 : DATA_2024);
+  const totalRev = currentData.reduce((acc, curr) => acc + (curr.revenue || 0), 0);
+  const totalExp = currentData.reduce((acc, curr) => acc + (curr.expenses || 0), 0);
+  const netMargin = totalRev - totalExp;
+  const totalIndirectCost = INDIRECT_COSTS.reduce((acc, curr) => acc + curr.cost, 0);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 text-slate-900 selection:bg-blue-500/20 font-sans">
+      
+      {/* Subtle Background Pattern */}
+      <div className="fixed inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-40" />
+      
+      {/* Sidebar */}
+      <Sidebar activeSection={activeSection} />
+      
+      {/* Main Content */}
+      <main className="lg:ml-64">
+        <div className="max-w-6xl mx-auto px-6 py-12 relative z-10">
+          
+          {/* ========== SECTION 1: INTRODUCTION ========== */}
+          <section id="introduction" className="pt-12 pb-16 scroll-mt-12">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="max-w-3xl"
+            >
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                <span className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Live Data Portal</span>
               </div>
-            </div>
-            <div className="w-full lg:w-[350px] space-y-4">
-              <h4 className="text-lg font-bold" style={{ color: THEME.text.primary }}>
-                Monthly Commitments
-              </h4>
-              <div className="h-[200px] w-full mb-4">
-                <BarChart
-                  dataset={'schedule' in breakdown.debt ? breakdown.debt.schedule : []}
-                  xAxis={[{ scaleType: 'band', dataKey: 'month', tickLabelStyle: { fill: THEME.text.secondary, fontSize: 8 } }]}
-                  series={[
-                    { dataKey: 'loan1', label: 'Loan 1', color: THEME.chart.debt, stack: 'total' },
-                    { dataKey: 'loan2', label: 'Loan 2', color: THEME.chart.tech, stack: 'total' },
-                  ]}
-                  {...commonChartProps}
-                  margin={{ left: 0, right: 0, top: 10, bottom: 20 }}
-                  slotProps={{ legend: {} } as any}
-                />
+              
+              <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-slate-800 to-slate-600 mb-6">
+                Investor Relations
+              </h1>
+              
+              <p className="text-xl text-slate-600 leading-relaxed mb-8">
+                Welcome to Sinjab's Investor Relations Portal. This dashboard provides transparent, 
+                real-time insights into our operational metrics, organizational structure, and 
+                strategic roadmap toward sustainable profitability.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div className="bg-white/70 backdrop-blur-sm border border-slate-200 rounded-xl p-4">
+                  <div className="text-3xl font-black text-blue-600">2022</div>
+                  <div className="text-sm text-slate-500">Founded</div>
+                </div>
+                <div className="bg-white/70 backdrop-blur-sm border border-slate-200 rounded-xl p-4">
+                  <div className="text-3xl font-black text-emerald-600">200K+</div>
+                  <div className="text-sm text-slate-500">Registered Users</div>
+                </div>
+                <div className="bg-white/70 backdrop-blur-sm border border-slate-200 rounded-xl p-4">
+                  <div className="text-3xl font-black text-purple-600">80+</div>
+                  <div className="text-sm text-slate-500">Partner Venues</div>
+                </div>
               </div>
-              {LOAN_DETAILS.map((loan, idx) => (
-                <div 
-                  key={idx} 
-                  className="p-4 rounded-2xl border backdrop-blur-sm"
-                  style={{
-                    background: THEME.card.background,
-                    borderColor: THEME.card.border,
-                  }}
-                >
-                  <div className="flex justify-between items-start mb-1">
-                    <div className="text-xs font-bold text-white">{loan.name}</div>
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: loan.color }} />
-                  </div>
-                  <div className="text-lg font-mono font-bold text-white">
-                    {loan.monthly} <span className="text-[10px]" style={{ color: THEME.text.secondary }}>SAR/mo</span>
+              
+              {/* Disclaimer */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="bg-amber-50 border border-amber-200 rounded-xl p-5"
+              >
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <div className="font-semibold text-amber-800 text-sm mb-1">Financial Disclaimer</div>
+                    <p className="text-amber-700 text-xs leading-relaxed">
+                      Data presented is for informational purposes only and should not be construed as 
+                      investment advice. Historical performance does not guarantee future results. 
+                      All figures are currently being reviewed by our financial partner and are subject to revision. 
+                      Confidential — For authorized investors only.
+                    </p>
                   </div>
                 </div>
+              </motion.div>
+            </motion.div>
+          </section>
+          
+          {/* ========== SECTION 2: FINANCIAL PERFORMANCE ========== */}
+          <section id="financial" className="py-24">
+            <SectionHeader 
+              id="financial-header"
+              title="Financial Performance" 
+              subtitle="Comprehensive view of revenue, expenses, and operational metrics."
+            />
+            
+            {/* View Toggle */}
+            <div className="flex justify-end mb-8">
+              <div className="bg-white/70 backdrop-blur-sm p-1 rounded-full flex gap-1 border border-slate-200 shadow-sm">
+                {[2024, 2025].map((y) => (
+                  <button 
+                    key={y} 
+                    onClick={() => setView(y as 2024 | 2025)} 
+                    className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
+                      view === y ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    {y}
+                  </button>
+                ))}
+                <button 
+                  onClick={() => setView('all')} 
+                  className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
+                    view === 'all' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                >
+                  All Time
+                </button>
+              </div>
+            </div>
+            
+            {/* Key Metrics */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+              <StatCard label="Total Revenue" value={formatCurrency(totalRev)} sub="Financial Actuals" icon={DollarSign} color={THEME.accent.blue} />
+              <StatCard label="Burn Rate" value={formatCurrency(totalExp)} sub="Operating Expenses" icon={Activity} color={THEME.accent.purple} />
+              <StatCard label="Net Efficiency" value={formatCurrency(netMargin)} sub={netMargin > 0 ? "Profit Surplus" : "Burn Window"} icon={TrendingUp} color={netMargin > 0 ? THEME.accent.green : THEME.accent.orange} />
+              <StatCard label="Security Level" value="SOC2 Type II" sub="Compliance Status" icon={Shield} color={THEME.accent.blue} />
+            </div>
+            
+            {/* Performance Overview Chart */}
+            <div className="mb-8">
+              <ChartCard title="Performance Overview" info={CHART_INFO.performance}>
+                <div className="h-[350px] w-full">
+                  <BarChart
+                    dataset={currentData}
+                    xAxis={[{ scaleType: 'band', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 10 } }]}
+                    series={[
+                      { dataKey: 'revenue', label: 'Revenue', color: THEME.accent.blue, stack: 'A' },
+                      { dataKey: 'expenses', label: 'Expenses', color: THEME.accent.purple, stack: 'B' },
+                    ]}
+                    yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
+                    {...commonChartProps}
+                  />
+                </div>
+              </ChartCard>
+            </div>
+            
+            {/* GMV & User Traction */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <ChartCard title="GMV Growth" info={CHART_INFO.gmv}>
+                <div className="h-[280px] w-full">
+                  <LineChart
+                    dataset={GMV_DATA}
+                    xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
+                    series={[{ dataKey: 'gmv', label: 'GMV (SAR)', color: THEME.accent.green, area: true, showMark: false, curve: 'linear' }]}
+                    yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
+                    {...commonChartProps}
+                  />
+                </div>
+              </ChartCard>
+              
+              <ChartCard title="User Retention & Capacity" info={CHART_INFO.userTraction}>
+                <div className="h-[280px] w-full">
+                  <LineChart
+                    dataset={USER_TRACTION_DATA}
+                    xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
+                    series={[
+                      { dataKey: 'activeUsers', label: 'Active Users', color: THEME.accent.blue, showMark: false, area: true },
+                      { dataKey: 'newUsers', label: 'New Users', color: THEME.accent.purple, showMark: false },
+                    ]}
+                    yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
+                    {...commonChartProps}
+                  />
+                </div>
+              </ChartCard>
+            </div>
+            
+            {/* Booking & Ticket Size */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <ChartCard title="Booking Volume" info={CHART_INFO.bookings}>
+                <div className="h-[280px] w-full">
+                  <BarChart
+                    dataset={GMV_DATA}
+                    xAxis={[{ scaleType: 'band', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 8 } }]}
+                    series={[{ dataKey: 'bookings', label: 'Bookings', color: THEME.accent.purple }]}
+                    yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
+                    {...commonChartProps}
+                  />
+                </div>
+              </ChartCard>
+              
+              <ChartCard title="Avg. Ticket Size" info={CHART_INFO.ticket}>
+                <div className="h-[280px] w-full">
+                  <LineChart
+                    dataset={TICKET_SIZE_DATA}
+                    xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
+                    series={[{ dataKey: 'ticket', label: 'SAR / Booking', color: THEME.accent.yellow, showMark: false }]}
+                    yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
+                    {...commonChartProps}
+                  />
+                </div>
+              </ChartCard>
+            </div>
+            
+            {/* Unit Economics & Costs */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <ChartCard title="Unit Economics" info={CHART_INFO.unitEconomics}>
+                <div className="h-[280px] w-full">
+                  <LineChart
+                    dataset={TAKE_RATE_DATA}
+                    xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
+                    series={[
+                      { dataKey: 'grossRevenue', label: 'Gross', color: THEME.accent.blue, showMark: false },
+                      { dataKey: 'netRevenue', label: 'Net Spread', color: THEME.accent.green, area: true, showMark: false },
+                    ]}
+                    yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
+                    {...commonChartProps}
+                  />
+                </div>
+              </ChartCard>
+              
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }} 
+                whileInView={{ opacity: 1, y: 0 }} 
+                viewport={{ once: true }}
+                className="bg-white/70 backdrop-blur-sm border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:border-slate-300 transition-all relative"
+              >
+                {/* Revision Alert Badge */}
+                <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-semibold">
+                  <TriangleAlert className="w-3.5 h-3.5" />
+                  Subject to Revision
+                </div>
+                
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-base font-bold text-slate-900 flex items-center">
+                    Cost Structure 
+                    <InfoTooltip info={CHART_INFO.expenses} />
+                  </h3>
+                </div>
+                <div className="h-[280px] w-full">
+                  <LineChart
+                    dataset={EXPENSE_HISTORY_CONSOLIDATED}
+                    xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
+                    series={[
+                      { dataKey: 'payroll', label: 'Payroll', color: THEME.accent.blue, showMark: false },
+                      { dataKey: 'tech', label: 'Tech', color: THEME.accent.purple, showMark: false },
+                      { dataKey: 'ops', label: 'Ops', color: THEME.accent.orange, showMark: false },
+                    ]}
+                    yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
+                    {...commonChartProps}
+                  />
+                </div>
+              </motion.div>
+            </div>
+            
+            {/* Debt Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              <ChartCard title="Debt Trajectory" info={CHART_INFO.debt} className="lg:col-span-2">
+                <div className="h-[280px] w-full">
+                  <LineChart
+                    dataset={DEBT_BALANCE_HISTORY}
+                    xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 10 } }]}
+                    series={[{ dataKey: 'balance', label: 'Principal Balance', color: THEME.accent.yellow, area: true, showMark: true }]}
+                    yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
+                    {...commonChartProps}
+                  />
+                </div>
+              </ChartCard>
+              
+              <div className="flex flex-col gap-4">
+                <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500">Capital Structure</h4>
+                {LOAN_DETAILS.map((loan, idx) => (
+                  <motion.div 
+                    key={idx} 
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="bg-white/70 backdrop-blur-sm border border-slate-200 p-4 rounded-xl"
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-bold text-slate-900">{loan.name}</span>
+                      <div className="w-2 h-2 rounded-full" style={{ background: loan.color }} />
+                    </div>
+                    <div className="text-xl font-black text-slate-900">
+                      {formatCurrency(parseFloat(loan.principal.replace(/,/g, '')))}
+                    </div>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-widest pt-2 mt-2 border-t border-slate-100">
+                      Monthly: {loan.monthly} SAR
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Outstanding Liabilities Table */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="bg-white/70 backdrop-blur-sm border border-slate-200 rounded-2xl p-6"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-slate-900">Outstanding Liabilities</h3>
+                <span className="text-xs text-slate-500 bg-slate-100 px-3 py-1 rounded-full">November 2025 Update</span>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-slate-200">
+                      <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Category</th>
+                      <th className="text-right py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Amount (SAR)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {LIABILITY_BREAKDOWN.map((item, idx) => (
+                      <motion.tr 
+                        key={idx}
+                        initial={{ opacity: 0, x: -10 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: idx * 0.05 }}
+                        className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors"
+                      >
+                        <td className="py-3 px-4 text-sm font-medium text-slate-900">{item.category}</td>
+                        <td className="py-3 px-4 text-sm font-semibold text-slate-900 text-right font-mono">
+                          {formatCurrency(item.amount)}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="bg-red-50 border-t-2 border-red-200">
+                      <td className="py-3 px-4 text-sm font-bold text-red-800">TOTAL LIABILITIES</td>
+                      <td className="py-3 px-4 text-lg font-black text-red-600 text-right font-mono">
+                        {formatCurrency(LIABILITY_TOTAL)}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </motion.div>
+          </section>
+          
+          {/* ========== SECTION 3: ORGANIZATIONAL STRUCTURE ========== */}
+          <section id="organization" className="py-24">
+            <SectionHeader 
+              id="org-header"
+              title="Organizational Structure" 
+              subtitle="Leadership team and operational hierarchy."
+            />
+            
+            {/* Org Chart */}
+            <div className="bg-white/70 backdrop-blur-sm border border-slate-200 rounded-2xl p-8 mb-8 overflow-hidden">
+              <h3 className="text-lg font-bold text-slate-900 mb-6">Company Hierarchy</h3>
+              <OrganizationChart />
+            </div>
+            
+            {/* Indirect Costs Table */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="bg-white/70 backdrop-blur-sm border border-slate-200 rounded-2xl p-6"
+            >
+              <h3 className="text-lg font-bold text-slate-900 mb-4">Monthly Indirect Cost Breakdown</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-slate-200">
+                      <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Role</th>
+                      <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Name</th>
+                      <th className="text-right py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Monthly Cost</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {INDIRECT_COSTS.map((item, idx) => (
+                      <motion.tr 
+                        key={idx}
+                        initial={{ opacity: 0, x: -10 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: idx * 0.05 }}
+                        className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors"
+                      >
+                        <td className="py-3 px-4 text-sm font-medium text-slate-900">{item.role}</td>
+                        <td className="py-3 px-4 text-sm text-slate-600">{item.name}</td>
+                        <td className="py-3 px-4 text-sm font-semibold text-slate-900 text-right">
+                          {formatCurrency(item.cost)}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="bg-slate-50">
+                      <td colSpan={2} className="py-3 px-4 text-sm font-bold text-slate-900">Total Indirect Costs</td>
+                      <td className="py-3 px-4 text-lg font-black text-blue-600 text-right">
+                        {formatCurrency(totalIndirectCost)}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </motion.div>
+          </section>
+          
+          {/* ========== SECTION 4: TECH ARCHITECTURE ========== */}
+          <section id="tech" className="py-24">
+            <SectionHeader 
+              id="tech-header"
+              title="Tech Architecture" 
+              subtitle="System infrastructure and code structure."
+            />
+            
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 rounded-2xl p-12 text-center relative overflow-hidden"
+            >
+              {/* Background pattern */}
+              <div className="absolute inset-0 opacity-5">
+                <div className="absolute inset-0" style={{ 
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                }} />
+              </div>
+              
+              <div className="relative z-10">
+                <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
+                  <Construction className="w-4 h-4" />
+                  Under Construction
+                </div>
+                
+                <Code2 className="w-20 h-20 text-slate-300 mx-auto mb-6" />
+                
+                <h3 className="text-2xl font-bold text-slate-900 mb-3">Code Structure Documentation</h3>
+                <p className="text-slate-500 max-w-md mx-auto mb-8">
+                  Detailed technical architecture, API documentation, and infrastructure diagrams 
+                  are currently being prepared.
+                </p>
+                
+                <div className="flex flex-wrap justify-center gap-3">
+                  {['Next.js 15', 'React 19', 'TypeScript', 'PostgreSQL', 'Redis', 'AWS'].map((tech) => (
+                    <span key={tech} className="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-sm text-slate-600 font-medium">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </section>
+          
+          {/* ========== SECTION 5: ROAD TO PROFITABILITY ========== */}
+          <section id="roadmap" className="py-24">
+            <SectionHeader 
+              id="roadmap-header"
+              title="Road to Profitability" 
+              subtitle="Strategic milestones for sustainable growth."
+            />
+            
+            <div className="max-w-3xl">
+              {MILESTONES.map((milestone, index) => (
+                <MilestoneCard key={milestone.id} milestone={milestone} index={index} />
               ))}
             </div>
+          </section>
+          
+          {/* ========== SECTION 6: FUTURE PROJECTIONS ========== */}
+          <section id="projections" className="py-24">
+            <SectionHeader 
+              id="projections-header"
+              title="Future Projections" 
+              subtitle="Financial modeling and growth scenarios."
+            />
+            
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 rounded-2xl p-12 text-center relative overflow-hidden"
+            >
+              {/* Background pattern */}
+              <div className="absolute inset-0 opacity-5">
+                <div className="absolute inset-0" style={{ 
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E")`,
+                }} />
+              </div>
+              
+              <div className="relative z-10">
+                <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
+                  <Hourglass className="w-4 h-4" />
+                  Coming Soon
+                </div>
+                
+                <TrendingUp className="w-20 h-20 text-slate-300 mx-auto mb-6" />
+                
+                <h3 className="text-2xl font-bold text-slate-900 mb-3">Financial Projections</h3>
+                <p className="text-slate-500 max-w-lg mx-auto mb-8">
+                  Financial modeling based on the implementation of the Road to Profitability strategy. 
+                  Detailed revenue forecasts, break-even analysis, and growth scenarios are being prepared.
+                </p>
+                
+                <div className="flex flex-wrap justify-center gap-3">
+                  {['Revenue Forecast', 'Break-Even Analysis', 'Growth Scenarios', 'Cash Flow Projections'].map((item) => (
+                    <span key={item} className="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-sm text-slate-600 font-medium">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </section>
+          
+          {/* Footer */}
+          <div className="border-t border-slate-200 pt-12 pb-8 text-center">
+            <p className="text-slate-400 text-xs uppercase tracking-[0.3em] font-semibold">
+              Confidential Enterprise Data • Sinjab Analytics v5.0
+            </p>
           </div>
-        </ChartCard>
-      </div>
-    </div>
-  );
-}
-
-// ============================================
-// HELPER COMPONENTS
-// ============================================
-
-function StatCard({ label, value, sub, accentColor }: any) {
-  return (
-    <div 
-      className="p-6 rounded-3xl backdrop-blur-xl border transition-all duration-300 group cursor-default"
-      style={{
-        background: THEME.card.background,
-        borderColor: THEME.card.border,
-      }}
-      onMouseEnter={(e) => e.currentTarget.style.boxShadow = THEME.card.hoverShadow}
-      onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
-    >
-      <div 
-        className="text-xs uppercase font-bold tracking-wider mb-3"
-        style={{ color: THEME.text.secondary }}
-      >
-        {label}
-      </div>
-      <div 
-        className="text-4xl font-black mb-2"
-        style={{ color: accentColor }}
-      >
-        {value}
-      </div>
-      <div 
-        className="text-sm"
-        style={{ color: THEME.text.secondary }}
-      >
-        {sub}
-      </div>
-    </div>
-  );
-}
-
-function SectionDivider() {
-  return (
-    <div className="my-16 h-px relative">
-      <div 
-        className="absolute inset-0"
-        style={{
-          background: `linear-gradient(90deg, transparent 0%, ${THEME.accent.neonPurple}40 50%, transparent 100%)`,
-        }}
-      />
-    </div>
-  );
-}
-
-function ChartCard({ 
-  title, 
-  subtitle, 
-  info, 
-  children, 
-  className = '' 
-}: { 
-  title: string; 
-  subtitle?: string; 
-  info: { calculation: string; source: string }; 
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div 
-      className={`rounded-3xl p-8 backdrop-blur-xl border transition-all duration-300 ${className}`}
-      style={{
-        background: THEME.card.background,
-        borderColor: THEME.card.border,
-      }}
-      onMouseEnter={(e) => e.currentTarget.style.boxShadow = THEME.card.hoverShadow}
-      onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
-    >
-      <div className="mb-6">
-        <h3 className="text-2xl font-bold flex items-center text-white">
-          {title}
-          <InfoTooltip info={info} />
-        </h3>
-        {subtitle && (
-          <p className="text-sm mt-1" style={{ color: THEME.text.secondary }}>
-            {subtitle}
-          </p>
-        )}
-      </div>
-      {children}
+          
+        </div>
+      </main>
     </div>
   );
 }
