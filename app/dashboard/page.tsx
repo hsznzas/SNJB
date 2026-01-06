@@ -277,6 +277,7 @@ const OrgNode = ({
   title, 
   name, 
   badge, 
+  badgeColor = "blue",
   icon: Icon, 
   color = "blue",
   subtitle,
@@ -285,6 +286,7 @@ const OrgNode = ({
   title: string; 
   name?: string; 
   badge?: string; 
+  badgeColor?: 'blue' | 'gray' | 'amber';
   icon: any; 
   color?: string;
   subtitle?: string;
@@ -297,6 +299,12 @@ const OrgNode = ({
     orange: 'bg-orange-50 border-orange-200 text-orange-700',
     slate: 'bg-slate-50 border-slate-200 text-slate-700',
     amber: 'bg-amber-50 border-amber-200 text-amber-700',
+  };
+  
+  const badgeColorClasses: Record<string, string> = {
+    blue: 'bg-blue-500 text-white',
+    gray: 'bg-slate-400 text-white',
+    amber: 'bg-amber-500 text-white',
   };
   
   return (
@@ -312,7 +320,7 @@ const OrgNode = ({
         {name && <div className="text-xs opacity-70 mt-1">{name}</div>}
         {subtitle && <div className="text-[10px] opacity-50 mt-1">{subtitle}</div>}
         {badge && (
-          <span className="absolute -top-2 -right-2 bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+          <span className={`absolute -top-2 -right-2 ${badgeColorClasses[badgeColor]} text-[9px] font-bold px-2 py-0.5 rounded-full`}>
             {badge}
           </span>
         )}
@@ -347,6 +355,8 @@ const OrganizationChart = () => (
             icon={Briefcase} 
             color="blue"
             subtitle="4 Employees"
+            badge="Partner"
+            badgeColor="blue"
           />
         </div>
         
@@ -359,6 +369,7 @@ const OrganizationChart = () => (
             icon={Scale} 
             color="purple"
             badge="2% Equity"
+            badgeColor="blue"
           />
         </div>
         
@@ -371,6 +382,7 @@ const OrganizationChart = () => (
             icon={Monitor} 
             color="green"
             badge="Partner"
+            badgeColor="blue"
           />
         </div>
         
@@ -382,6 +394,7 @@ const OrganizationChart = () => (
             icon={Building} 
             color="orange"
             badge="Vacant"
+            badgeColor="gray"
           />
           <OrgConnector />
           
@@ -652,9 +665,9 @@ export default function InvestorRelations() {
                   <div>
                     <div className="font-semibold text-amber-800 text-sm mb-1">Financial Disclaimer</div>
                     <p className="text-amber-700 text-xs leading-relaxed">
-                      Data presented is for informational purposes only and should not be construed as 
+                      The data presented is currently under review by our financial partner. 
+                      Information is for informational purposes only and should not be construed as 
                       investment advice. Historical performance does not guarantee future results. 
-                      All figures are currently being reviewed by our financial partner and are subject to revision. 
                       Confidential — For authorized investors only.
                     </p>
                   </div>
@@ -907,9 +920,9 @@ export default function InvestorRelations() {
                     ))}
                   </tbody>
                   <tfoot>
-                    <tr className="bg-red-50 border-t-2 border-red-200">
-                      <td className="py-3 px-4 text-sm font-bold text-red-800">TOTAL LIABILITIES</td>
-                      <td className="py-3 px-4 text-lg font-black text-red-600 text-right font-mono">
+                    <tr className="bg-blue-50 border-t-2 border-blue-200">
+                      <td className="py-3 px-4 text-sm font-bold text-blue-800">TOTAL LIABILITIES</td>
+                      <td className="py-3 px-4 text-lg font-black text-blue-600 text-right font-mono">
                         {formatCurrency(LIABILITY_TOTAL)}
                       </td>
                     </tr>
