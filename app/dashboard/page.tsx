@@ -78,11 +78,12 @@ const formatCurrency = (amount: number) => {
 };
 
 // Common props for MUI Charts - Light Mode
+// Note: hideLegend suppresses React DOM warnings from MUI's internal legend component
 const commonChartProps = {
   grid: { horizontal: true },
-  margin: { top: 30, bottom: 40, left: 80, right: 30 },
+  margin: { top: 20, bottom: 40, left: 80, right: 30 },
+  hideLegend: true,
   sx: {
-    '.MuiChartsLegend-root text': { fill: `${THEME.accent.textSecondary} !important`, fontSize: 11 }, 
     '.MuiChartsAxis-tickLabel': { fill: `${THEME.accent.textSecondary} !important`, fontSize: 10 },
     '.MuiChartsAxis-line': { stroke: 'rgba(0,0,0,0.1) !important' },
     '.MuiChartsAxis-tick': { stroke: 'rgba(0,0,0,0.1) !important' },
@@ -137,6 +138,18 @@ const NAV_ITEMS = [
 ];
 
 // --- COMPONENTS ---
+
+// Simple custom legend to avoid MUI's internal prop warnings
+const ChartLegend = ({ items }: { items: { label: string; color: string }[] }) => (
+  <div className="flex flex-wrap gap-4 mb-4">
+    {items.map((item, idx) => (
+      <div key={idx} className="flex items-center gap-2">
+        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: item.color }} />
+        <span className="text-xs text-slate-600">{item.label}</span>
+      </div>
+    ))}
+  </div>
+);
 
 const InfoTooltip = ({ info }: { info: { calculation: string; source: string } }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -838,7 +851,11 @@ export default function InvestorRelations() {
             {/* Performance Overview Chart */}
             <div className="mb-8">
               <ChartCard title="Performance Overview" info={CHART_INFO.performance}>
-                <div className="h-[350px] w-full">
+                <ChartLegend items={[
+                  { label: 'Revenue', color: THEME.accent.blue },
+                  { label: 'Expenses', color: THEME.accent.purple },
+                ]} />
+                <div className="h-[320px] w-full">
                   <BarChart
                     dataset={currentData}
                     xAxis={[{ scaleType: 'band', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 10 } }]}
@@ -868,7 +885,11 @@ export default function InvestorRelations() {
               </ChartCard>
               
               <ChartCard title="User Retention & Capacity" info={CHART_INFO.userTraction}>
-                <div className="h-[280px] w-full">
+                <ChartLegend items={[
+                  { label: 'Active Users', color: THEME.accent.blue },
+                  { label: 'New Users', color: THEME.accent.purple },
+                ]} />
+                <div className="h-[250px] w-full">
                   <LineChart
                     dataset={USER_TRACTION_DATA}
                     xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
@@ -913,7 +934,11 @@ export default function InvestorRelations() {
             {/* Unit Economics & Costs */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
               <ChartCard title="Unit Economics" info={CHART_INFO.unitEconomics}>
-                <div className="h-[280px] w-full">
+                <ChartLegend items={[
+                  { label: 'Gross Revenue', color: THEME.accent.blue },
+                  { label: 'Net Spread', color: THEME.accent.green },
+                ]} />
+                <div className="h-[250px] w-full">
                   <LineChart
                     dataset={TAKE_RATE_DATA}
                     xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
@@ -939,13 +964,18 @@ export default function InvestorRelations() {
                   Subject to Revision
                 </div>
                 
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-4">
                   <h3 className="text-base font-bold text-slate-900 flex items-center">
                     Cost Structure 
                     <InfoTooltip info={CHART_INFO.expenses} />
                   </h3>
                 </div>
-                <div className="h-[280px] w-full">
+                <ChartLegend items={[
+                  { label: 'Payroll', color: THEME.accent.blue },
+                  { label: 'Tech', color: THEME.accent.purple },
+                  { label: 'Operations', color: THEME.accent.orange },
+                ]} />
+                <div className="h-[230px] w-full">
                   <LineChart
                     dataset={EXPENSE_HISTORY_CONSOLIDATED}
                     xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
