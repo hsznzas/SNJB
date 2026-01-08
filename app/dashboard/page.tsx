@@ -854,7 +854,7 @@ export default function InvestorRelations() {
               <ChartCard title="Performance Overview" info={CHART_INFO.performance}>
                 <ChartLegend items={[
                   { label: 'Revenue', color: THEME.accent.blue },
-                  { label: 'Expenses', color: THEME.accent.purple },
+                  { label: 'Expenses', color: THEME.accent.grayDark },
                 ]} />
                 <div className="h-[320px] w-full">
           <BarChart
@@ -888,7 +888,7 @@ export default function InvestorRelations() {
               <ChartCard title="User Retention & Capacity" info={CHART_INFO.userTraction}>
                 <ChartLegend items={[
                   { label: 'Active Users', color: THEME.accent.blue },
-                  { label: 'New Users', color: THEME.accent.purple },
+                  { label: 'New Users', color: THEME.accent.grayDark },
                 ]} />
                 <div className="h-[250px] w-full">
                     <LineChart
@@ -973,8 +973,8 @@ export default function InvestorRelations() {
                 </div>
                 <ChartLegend items={[
                   { label: 'Payroll', color: THEME.accent.blue },
-                  { label: 'Tech', color: THEME.accent.purple },
-                  { label: 'Operations', color: THEME.accent.orange },
+                  { label: 'Tech', color: THEME.accent.grayDark },
+                  { label: 'Operations', color: THEME.accent.grayMedium },
                 ]} />
                 <div className="h-[230px] w-full">
               <LineChart
