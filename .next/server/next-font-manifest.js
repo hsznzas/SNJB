@@ -1,1 +1,0 @@
-self.__NEXT_FONT_MANIFEST="{\"pages\":{},\"app\":{\"/Users/hassan/Projects/SNJB/app/layout\":[\"static/media/68180864d7f93f02-s.p.woff2\",\"static/media/68180864d7f93f02-s.p.woff2\"]},\"appUsingSizeAdjust\":true,\"pagesUsingSizeAdjust\":false}"
