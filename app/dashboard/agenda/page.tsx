@@ -16,7 +16,8 @@ import {
   Banknote,
   FileText,
   Target,
-  User
+  User,
+  type LucideIcon
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -57,7 +58,7 @@ const AgendaCard = ({
 }: { 
   number: number; 
   title: string; 
-  icon: any; 
+  icon: LucideIcon; 
   children: React.ReactNode;
   iconColor?: string;
 }) => (

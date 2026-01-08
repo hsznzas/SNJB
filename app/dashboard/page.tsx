@@ -30,13 +30,14 @@ import {
   Hourglass,
   Coins,
   TriangleAlert,
-  Wallet
+  Wallet,
+  type LucideIcon
 } from 'lucide-react';
 import { 
   DATA_2024, 
   DATA_2025, 
   DATA_CONSOLIDATED, 
-  DEBT_BALANCE_HISTORY,
+  DEBT_BALANCE_HISTORY, 
   DEBT_SCHEDULE, 
   LOAN_DETAILS,
   GMV_DATA,
@@ -253,7 +254,7 @@ const StatCard = ({ label, value, sub, icon: Icon, color }: {
   label: string; 
   value: string; 
   sub: string; 
-  icon: any; 
+  icon: LucideIcon; 
   color: string 
 }) => (
   <motion.div 
@@ -302,7 +303,7 @@ const OrgNode = ({
   name?: string; 
   badge?: string; 
   badgeColor?: 'blue' | 'gray' | 'amber';
-  icon: any; 
+  icon: LucideIcon; 
   color?: string;
   subtitle?: string;
   children?: React.ReactNode;
@@ -794,7 +795,7 @@ export default function InvestorRelations() {
             >
               <div className="flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-slate-600 flex-shrink-0 mt-0.5" />
-                <div>
+        <div>
                   <div className="font-semibold text-slate-800 text-sm mb-1">Financial Disclaimer</div>
                   <p className="text-slate-600 text-xs leading-relaxed">
                     All financial data is sourced from verified bank statements and internal ledgers. 
@@ -803,7 +804,7 @@ export default function InvestorRelations() {
                     investment advice. Confidential — For authorized investors only.
                   </p>
                 </div>
-              </div>
+        </div>
             </motion.div>
           </section>
           
@@ -818,36 +819,36 @@ export default function InvestorRelations() {
             {/* View Toggle */}
             <div className="flex justify-end mb-8">
               <div className="bg-white/70 backdrop-blur-sm p-1 rounded-full flex gap-1 border border-slate-200 shadow-sm">
-                {[2024, 2025].map((y) => (
-                  <button 
-                    key={y} 
-                    onClick={() => setView(y as 2024 | 2025)} 
+          {[2024, 2025].map((y) => (
+            <button
+              key={y}
+              onClick={() => setView(y as 2024 | 2025)}
                     className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
                       view === y ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500 hover:text-slate-900'
-                    }`}
-                  >
-                    {y}
-                  </button>
-                ))}
-                <button 
+              }`}
+            >
+              {y}
+            </button>
+          ))}
+          <button
                   onClick={() => setView('all')} 
                   className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
                     view === 'all' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-900'
                   }`}
                 >
                   All Time
-                </button>
-              </div>
-            </div>
-            
+          </button>
+        </div>
+      </div>
+
             {/* Key Metrics */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
               <StatCard label="Total Revenue" value={formatCurrency(totalRev)} sub="Financial Actuals" icon={DollarSign} color={THEME.accent.blue} />
               <StatCard label="Burn Rate" value={formatCurrency(totalExp)} sub="Operating Expenses" icon={Activity} color={THEME.accent.grayDark} />
               <StatCard label="Net Efficiency" value={formatCurrency(netMargin)} sub={netMargin > 0 ? "Profit Surplus" : "Burn Window"} icon={TrendingUp} color={netMargin > 0 ? THEME.accent.green : THEME.accent.grayDark} />
               <StatCard label="Security Level" value="SOC2 Type II" sub="Compliance Status" icon={Shield} color={THEME.accent.blue} />
-            </div>
-            
+      </div>
+
             {/* Performance Overview Chart */}
             <div className="mb-8">
               <ChartCard title="Performance Overview" info={CHART_INFO.performance}>
@@ -856,19 +857,19 @@ export default function InvestorRelations() {
                   { label: 'Expenses', color: THEME.accent.purple },
                 ]} />
                 <div className="h-[320px] w-full">
-                  <BarChart
-                    dataset={currentData}
+          <BarChart
+            dataset={currentData}
                     xAxis={[{ scaleType: 'band', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 10 } }]}
-                    series={[
+            series={[
                       { dataKey: 'revenue', label: 'Revenue', color: THEME.accent.blue, stack: 'A' },
                       { dataKey: 'expenses', label: 'Expenses', color: THEME.accent.grayDark, stack: 'B' },
-                    ]}
+            ]}
                     yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
-                    {...commonChartProps}
-                  />
-                </div>
+            {...commonChartProps}
+          />
+        </div>
               </ChartCard>
-            </div>
+      </div>
             
             {/* GMV & User Traction */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -890,47 +891,47 @@ export default function InvestorRelations() {
                   { label: 'New Users', color: THEME.accent.purple },
                 ]} />
                 <div className="h-[250px] w-full">
-                  <LineChart
-                    dataset={USER_TRACTION_DATA}
+                    <LineChart
+                      dataset={USER_TRACTION_DATA}
                     xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
-                    series={[
+                      series={[
                       { dataKey: 'activeUsers', label: 'Active Users', color: THEME.accent.blue, showMark: false, area: true },
                       { dataKey: 'newUsers', label: 'New Users', color: THEME.accent.grayDark, showMark: false },
                     ]}
                     yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
-                    {...commonChartProps}
-                  />
-                </div>
+                      {...commonChartProps}
+                    />
+                 </div>
               </ChartCard>
             </div>
-            
+
             {/* Booking & Ticket Size */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
               <ChartCard title="Booking Volume" info={CHART_INFO.bookings}>
                 <div className="h-[280px] w-full">
-                  <BarChart
-                    dataset={GMV_DATA}
+                      <BarChart
+                      dataset={GMV_DATA}
                     xAxis={[{ scaleType: 'band', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 8 } }]}
                     series={[{ dataKey: 'bookings', label: 'Bookings', color: THEME.accent.blue }]}
                     yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
-                    {...commonChartProps}
-                  />
+                      {...commonChartProps}
+                      />
                 </div>
               </ChartCard>
               
               <ChartCard title="Avg. Ticket Size" info={CHART_INFO.ticket}>
                 <div className="h-[280px] w-full">
-                  <LineChart
-                    dataset={TICKET_SIZE_DATA}
+                      <LineChart
+                      dataset={TICKET_SIZE_DATA}
                     xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
                     series={[{ dataKey: 'ticket', label: 'SAR / Booking', color: THEME.accent.blue, showMark: false }]}
                     yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
-                    {...commonChartProps}
-                  />
+                      {...commonChartProps}
+                      />
                 </div>
               </ChartCard>
             </div>
-            
+
             {/* Unit Economics & Costs */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
               <ChartCard title="Unit Economics" info={CHART_INFO.unitEconomics}>
@@ -939,17 +940,17 @@ export default function InvestorRelations() {
                   { label: 'Net Spread', color: THEME.accent.green },
                 ]} />
                 <div className="h-[250px] w-full">
-                  <LineChart
-                    dataset={TAKE_RATE_DATA}
+                 <LineChart
+                  dataset={TAKE_RATE_DATA}
                     xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
-                    series={[
+                  series={[
                       { dataKey: 'grossRevenue', label: 'Gross', color: THEME.accent.blue, showMark: false },
                       { dataKey: 'netRevenue', label: 'Net Spread', color: THEME.accent.green, area: true, showMark: false },
-                    ]}
+                  ]}
                     yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
-                    {...commonChartProps}
-                  />
-                </div>
+                  {...commonChartProps}
+                />
+              </div>
               </ChartCard>
               
               <motion.div 
@@ -962,8 +963,8 @@ export default function InvestorRelations() {
                 <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-semibold border border-slate-300">
                   <TriangleAlert className="w-3.5 h-3.5" />
                   Subject to Revision
-                </div>
-                
+            </div>
+
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-base font-bold text-slate-900 flex items-center">
                     Cost Structure 
@@ -976,19 +977,19 @@ export default function InvestorRelations() {
                   { label: 'Operations', color: THEME.accent.orange },
                 ]} />
                 <div className="h-[230px] w-full">
-                  <LineChart
+              <LineChart
                     dataset={EXPENSE_HISTORY_CONSOLIDATED}
                     xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
-                    series={[
+                series={[
                       { dataKey: 'payroll', label: 'Payroll', color: THEME.accent.blue, showMark: false },
                       { dataKey: 'tech', label: 'Tech', color: THEME.accent.grayDark, showMark: false },
                       { dataKey: 'ops', label: 'Ops', color: THEME.accent.grayMedium, showMark: false },
                     ]}
                     yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
-                    {...commonChartProps}
-                  />
-                </div>
-              </motion.div>
+                {...commonChartProps}
+              />
+            </div>
+          </motion.div>
             </div>
             
             {/* Debt Section */}
@@ -1025,7 +1026,7 @@ export default function InvestorRelations() {
                     </div>
                     <div className="text-[10px] text-slate-400 uppercase tracking-widest pt-2 mt-2 border-t border-slate-100">
                       Monthly: {loan.monthly} SAR
-                    </div>
+                  </div>
                   </motion.div>
                 ))}
               </div>
@@ -1243,10 +1244,10 @@ export default function InvestorRelations() {
                     <span key={item} className="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-sm text-slate-600 font-medium">
                       {item}
                     </span>
-                  ))}
-                </div>
+                ))}
               </div>
-            </motion.div>
+            </div>
+          </motion.div>
           </section>
           
           {/* Footer */}
@@ -1254,7 +1255,7 @@ export default function InvestorRelations() {
             <p className="text-slate-400 text-xs uppercase tracking-[0.3em] font-semibold">
               Confidential Enterprise Data • Sinjab Analytics v5.0
             </p>
-          </div>
+    </div>
           
         </div>
       </main>
