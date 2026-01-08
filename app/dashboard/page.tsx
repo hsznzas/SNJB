@@ -29,7 +29,8 @@ import {
   Construction,
   Hourglass,
   Coins,
-  TriangleAlert
+  TriangleAlert,
+  Wallet
 } from 'lucide-react';
 import { 
   DATA_2024, 
@@ -47,7 +48,7 @@ import {
   LIABILITY_TOTAL
 } from '@/data/dashboard-data';
 
-// --- THEME CONFIGURATION (Light Mode) ---
+// --- THEME CONFIGURATION (Professional Minimal Colors) ---
 const THEME = {
   background: {
     primary: '#fafbfc',
@@ -55,12 +56,13 @@ const THEME = {
     accent: '#f1f5f9',
   },
   accent: {
-    blue: '#2563eb',
-    purple: '#7c3aed',
-    green: '#059669',
-    orange: '#ea580c',
-    red: '#dc2626',
-    yellow: '#ca8a04',
+    // Primary colors - use sparingly
+    blue: '#3b82f6',        // Professional blue for primary data
+    green: '#059669',       // Only for growth/positive metrics
+    // Neutral tones - use for secondary/contrasting elements
+    gray: '#94a3b8',        // Light gray for secondary data
+    grayDark: '#334155',    // Dark gray for high contrast
+    grayMedium: '#64748b',  // Medium gray
     text: '#0f172a',
     textSecondary: '#64748b',
   }
@@ -615,64 +617,180 @@ export default function InvestorRelations() {
       <main className="lg:ml-64">
         <div className="max-w-6xl mx-auto px-6 py-12 relative z-10">
           
-          {/* ========== SECTION 1: INTRODUCTION ========== */}
+          {/* ========== SECTION 1: INTRODUCTION (POWER HERO) ========== */}
           <section id="introduction" className="pt-12 pb-16 scroll-mt-12">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="max-w-3xl"
+            {/* Light Hero Container */}
+            <div 
+              className="relative rounded-3xl overflow-hidden mb-12 bg-gradient-to-br from-white via-slate-50 to-blue-50/30 border border-slate-200"
             >
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                <span className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Live Data Portal</span>
-              </div>
+              {/* Subtle Grid Pattern */}
+              <div 
+                className="absolute inset-0 opacity-30 pointer-events-none"
+                style={{
+                  backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(71, 85, 105, 0.1) 1px, transparent 0)',
+                  backgroundSize: '40px 40px'
+                }}
+              />
               
-              <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-slate-800 to-slate-600 mb-6">
-                Investor Relations
-              </h1>
-              
-              <p className="text-xl text-slate-600 leading-relaxed mb-8">
-                Welcome to Sinjab's Investor Relations Portal. This dashboard provides transparent, 
-                real-time insights into our operational metrics, organizational structure, and 
-                strategic roadmap toward sustainable profitability.
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                <div className="bg-white/70 backdrop-blur-sm border border-slate-200 rounded-xl p-4">
-                  <div className="text-3xl font-black text-blue-600">2022</div>
-                  <div className="text-sm text-slate-500">Founded</div>
-                </div>
-                <div className="bg-white/70 backdrop-blur-sm border border-slate-200 rounded-xl p-4">
-                  <div className="text-3xl font-black text-emerald-600">200K+</div>
-                  <div className="text-sm text-slate-500">Registered Users</div>
-                </div>
-                <div className="bg-white/70 backdrop-blur-sm border border-slate-200 rounded-xl p-4">
-                  <div className="text-3xl font-black text-purple-600">80+</div>
-                  <div className="text-sm text-slate-500">Partner Venues</div>
-                </div>
-              </div>
-              
-              {/* Disclaimer */}
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="bg-amber-50 border border-amber-200 rounded-xl p-5"
-              >
-                <div className="flex items-start gap-3">
-                  <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <div className="font-semibold text-amber-800 text-sm mb-1">Financial Disclaimer</div>
-                    <p className="text-amber-700 text-xs leading-relaxed">
-                      The data presented is currently under review by our financial partner. 
-                      Information is for informational purposes only and should not be construed as 
-                      investment advice. Historical performance does not guarantee future results. 
-                      Confidential — For authorized investors only.
-                    </p>
+              <div className="relative z-10 p-8 md:p-12">
+                {/* Hero Headline */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="mb-12"
+                >
+                  <div className="flex items-center gap-2 mb-6">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                    <span className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Verified Data • Real-Time</span>
                   </div>
+                  
+                  <h1 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-slate-700 to-slate-600">
+                      The Operating System for Sports in Saudi Arabia.
+                    </span>
+                  </h1>
+                  
+                  <p className="text-lg md:text-xl text-slate-600 leading-relaxed max-w-4xl">
+                    Sinjab is the vertical SaaS and Fintech layer powering the Kingdom's sports infrastructure. 
+                    We have transitioned from high-growth acquisition to operational profitability.
+                  </p>
+                </motion.div>
+
+                {/* Traction Grid - 4 High-Contrast Cards */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.6 }}
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+                >
+                  {/* Metric 1: Financial */}
+                  <div className="bg-white/70 backdrop-blur-xl border border-slate-200 rounded-2xl p-6 hover:bg-white/90 hover:border-slate-300 hover:shadow-lg transition-all group">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="p-3 rounded-xl bg-slate-100 border border-slate-300">
+                        <Wallet className="w-6 h-6 text-slate-600" />
+                      </div>
+                      <div className="text-xs text-slate-600 uppercase tracking-wider font-semibold">Verified</div>
+                    </div>
+                    <div className="text-4xl md:text-5xl font-black text-slate-900 mb-2">28.7M SAR</div>
+                    <div className="text-sm text-slate-600 mb-1">2024 Verified GMV</div>
+                    <div className="text-xs text-slate-500 font-mono">Source: Bank Statement</div>
+                  </div>
+
+                  {/* Metric 2: Volume */}
+                  <div className="bg-white/70 backdrop-blur-xl border border-slate-200 rounded-2xl p-6 hover:bg-white/90 hover:border-slate-300 hover:shadow-lg transition-all group">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="p-3 rounded-xl bg-slate-100 border border-slate-300">
+                        <Activity className="w-6 h-6 text-slate-600" />
+                      </div>
+                      <div className="text-xs text-slate-600 uppercase tracking-wider font-semibold">Confirmed</div>
+                    </div>
+                    <div className="text-4xl md:text-5xl font-black text-slate-900 mb-2">326,000+</div>
+                    <div className="text-sm text-slate-600 mb-1">Confirmed Matches (2024)</div>
+                    <div className="text-xs text-slate-500 font-mono">Source: Booking Logs</div>
+                  </div>
+
+                  {/* Metric 3: Infrastructure */}
+                  <div className="bg-white/70 backdrop-blur-xl border border-slate-200 rounded-2xl p-6 hover:bg-white/90 hover:border-slate-300 hover:shadow-lg transition-all group">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="p-3 rounded-xl bg-slate-100 border border-slate-300">
+                        <Building2 className="w-6 h-6 text-slate-600" />
+                      </div>
+                      <div className="text-xs text-slate-600 uppercase tracking-wider font-semibold">Network</div>
+                    </div>
+                    <div className="text-4xl md:text-5xl font-black text-slate-900 mb-2">140+ Clubs</div>
+                    <div className="text-sm text-slate-600 mb-1">Partner Facilities</div>
+                    <div className="text-xs text-slate-500 font-mono">Source: Investment Brief</div>
+                  </div>
+
+                  {/* Metric 4: Reach */}
+                  <div className="bg-white/70 backdrop-blur-xl border border-slate-200 rounded-2xl p-6 hover:bg-white/90 hover:border-slate-300 hover:shadow-lg transition-all group">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="p-3 rounded-xl bg-slate-100 border border-slate-300">
+                        <Users className="w-6 h-6 text-slate-600" />
+                      </div>
+                      <div className="text-xs text-slate-600 uppercase tracking-wider font-semibold">Impact</div>
+                    </div>
+                    <div className="text-4xl md:text-5xl font-black text-slate-900 mb-2">8 Million+</div>
+                    <div className="text-sm text-slate-600 mb-1">Annual Beneficiaries</div>
+                    <div className="text-xs text-slate-500 font-mono">Source: Investment Brief (Page 41)</div>
+                  </div>
+                </motion.div>
+
+                {/* Strategic Evolution Timeline */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.6 }}
+                  className="mb-12"
+                >
+                  <h3 className="text-xl font-bold text-slate-900 mb-6">Strategic Evolution</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="relative bg-slate-50 border border-slate-200 rounded-xl p-5 hover:bg-slate-100 transition-all">
+                      <div className="text-xs text-slate-600 uppercase tracking-wider mb-2 font-semibold">2022</div>
+                      <div className="text-sm text-slate-700 leading-relaxed">MVP & Market Entry</div>
+                      <div className="absolute top-3 right-3 w-2 h-2 bg-slate-400 rounded-full" />
+                    </div>
+                    <div className="relative bg-slate-50 border border-slate-200 rounded-xl p-5 hover:bg-slate-100 transition-all">
+                      <div className="text-xs text-slate-600 uppercase tracking-wider mb-2 font-semibold">2023</div>
+                      <div className="text-sm text-slate-700 leading-relaxed">Hyper-Growth (Acquisition Phase)</div>
+                      <div className="absolute top-3 right-3 w-2 h-2 bg-slate-400 rounded-full" />
+                    </div>
+                    <div className="relative bg-emerald-50 border border-emerald-200 rounded-xl p-5 hover:bg-emerald-100 transition-all">
+                      <div className="text-xs text-emerald-700 uppercase tracking-wider mb-2 font-semibold">2024</div>
+                      <div className="text-sm text-slate-700 leading-relaxed">Market Leadership (28M SAR Run Rate)</div>
+                      <div className="absolute top-3 right-3 w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                    </div>
+                    <div className="relative bg-slate-50 border border-slate-200 rounded-xl p-5 hover:bg-slate-100 transition-all">
+                      <div className="text-xs text-slate-600 uppercase tracking-wider mb-2 font-semibold">2025</div>
+                      <div className="text-sm text-slate-700 leading-relaxed">Financial Optimization & B2B Expansion</div>
+                      <div className="absolute top-3 right-3 w-2 h-2 bg-slate-400 rounded-full" />
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Trust Bar - Partners */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7, duration: 0.6 }}
+                >
+                  <div className="text-center mb-6">
+                    <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wider">Trusted by Industry Leaders</h3>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-center gap-4">
+                    {['Aramco', 'Roshn', 'STC Bank', 'AlRajhi Bank', 'Noon', 'Webook', 'Wala'].map((partner, idx) => (
+                      <div 
+                        key={partner}
+                        className="bg-white/70 backdrop-blur-xl border border-slate-200 rounded-xl px-6 py-3 hover:bg-white/90 hover:border-slate-300 hover:shadow-md transition-all"
+                      >
+                        <span className="text-sm font-semibold text-slate-700">{partner}</span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+
+            {/* Financial Disclaimer */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.9 }}
+              className="bg-slate-50 border border-slate-200 rounded-xl p-5"
+            >
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-slate-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <div className="font-semibold text-slate-800 text-sm mb-1">Financial Disclaimer</div>
+                  <p className="text-slate-600 text-xs leading-relaxed">
+                    All financial data is sourced from verified bank statements and internal ledgers. 
+                    Ecosystem metrics are derived from the Investment Brief 2025. 
+                    Information is for informational purposes only and should not be construed as 
+                    investment advice. Confidential — For authorized investors only.
+                  </p>
                 </div>
-              </motion.div>
+              </div>
             </motion.div>
           </section>
           
@@ -712,8 +830,8 @@ export default function InvestorRelations() {
             {/* Key Metrics */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
               <StatCard label="Total Revenue" value={formatCurrency(totalRev)} sub="Financial Actuals" icon={DollarSign} color={THEME.accent.blue} />
-              <StatCard label="Burn Rate" value={formatCurrency(totalExp)} sub="Operating Expenses" icon={Activity} color={THEME.accent.purple} />
-              <StatCard label="Net Efficiency" value={formatCurrency(netMargin)} sub={netMargin > 0 ? "Profit Surplus" : "Burn Window"} icon={TrendingUp} color={netMargin > 0 ? THEME.accent.green : THEME.accent.orange} />
+              <StatCard label="Burn Rate" value={formatCurrency(totalExp)} sub="Operating Expenses" icon={Activity} color={THEME.accent.grayDark} />
+              <StatCard label="Net Efficiency" value={formatCurrency(netMargin)} sub={netMargin > 0 ? "Profit Surplus" : "Burn Window"} icon={TrendingUp} color={netMargin > 0 ? THEME.accent.green : THEME.accent.grayDark} />
               <StatCard label="Security Level" value="SOC2 Type II" sub="Compliance Status" icon={Shield} color={THEME.accent.blue} />
             </div>
             
@@ -726,7 +844,7 @@ export default function InvestorRelations() {
                     xAxis={[{ scaleType: 'band', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 10 } }]}
                     series={[
                       { dataKey: 'revenue', label: 'Revenue', color: THEME.accent.blue, stack: 'A' },
-                      { dataKey: 'expenses', label: 'Expenses', color: THEME.accent.purple, stack: 'B' },
+                      { dataKey: 'expenses', label: 'Expenses', color: THEME.accent.grayDark, stack: 'B' },
                     ]}
                     yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
                     {...commonChartProps}
@@ -756,7 +874,7 @@ export default function InvestorRelations() {
                     xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
                     series={[
                       { dataKey: 'activeUsers', label: 'Active Users', color: THEME.accent.blue, showMark: false, area: true },
-                      { dataKey: 'newUsers', label: 'New Users', color: THEME.accent.purple, showMark: false },
+                      { dataKey: 'newUsers', label: 'New Users', color: THEME.accent.grayDark, showMark: false },
                     ]}
                     yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
                     {...commonChartProps}
@@ -772,7 +890,7 @@ export default function InvestorRelations() {
                   <BarChart
                     dataset={GMV_DATA}
                     xAxis={[{ scaleType: 'band', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 8 } }]}
-                    series={[{ dataKey: 'bookings', label: 'Bookings', color: THEME.accent.purple }]}
+                    series={[{ dataKey: 'bookings', label: 'Bookings', color: THEME.accent.blue }]}
                     yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
                     {...commonChartProps}
                   />
@@ -784,7 +902,7 @@ export default function InvestorRelations() {
                   <LineChart
                     dataset={TICKET_SIZE_DATA}
                     xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
-                    series={[{ dataKey: 'ticket', label: 'SAR / Booking', color: THEME.accent.yellow, showMark: false }]}
+                    series={[{ dataKey: 'ticket', label: 'SAR / Booking', color: THEME.accent.blue, showMark: false }]}
                     yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
                     {...commonChartProps}
                   />
@@ -816,7 +934,7 @@ export default function InvestorRelations() {
                 className="bg-white/70 backdrop-blur-sm border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:border-slate-300 transition-all relative"
               >
                 {/* Revision Alert Badge */}
-                <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-semibold">
+                <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-semibold border border-slate-300">
                   <TriangleAlert className="w-3.5 h-3.5" />
                   Subject to Revision
                 </div>
@@ -833,8 +951,8 @@ export default function InvestorRelations() {
                     xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
                     series={[
                       { dataKey: 'payroll', label: 'Payroll', color: THEME.accent.blue, showMark: false },
-                      { dataKey: 'tech', label: 'Tech', color: THEME.accent.purple, showMark: false },
-                      { dataKey: 'ops', label: 'Ops', color: THEME.accent.orange, showMark: false },
+                      { dataKey: 'tech', label: 'Tech', color: THEME.accent.grayDark, showMark: false },
+                      { dataKey: 'ops', label: 'Ops', color: THEME.accent.grayMedium, showMark: false },
                     ]}
                     yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
                     {...commonChartProps}
@@ -850,7 +968,7 @@ export default function InvestorRelations() {
                   <LineChart
                     dataset={DEBT_BALANCE_HISTORY}
                     xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 10 } }]}
-                    series={[{ dataKey: 'balance', label: 'Principal Balance', color: THEME.accent.yellow, area: true, showMark: true }]}
+                    series={[{ dataKey: 'balance', label: 'Principal Balance', color: THEME.accent.blue, area: true, showMark: true }]}
                     yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
                     {...commonChartProps}
                   />
