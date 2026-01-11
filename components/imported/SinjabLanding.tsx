@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 // --- THEME CONSTANTS ---
 const COLORS = {
-  navyDeep: '#000F80',
+  navyDeep: '#0C125C',
   black: '#000000',
   sinjabBlue: '#1B5BCC',
   white: '#FFFFFF',
@@ -726,7 +726,7 @@ export default function SinjabLanding() {
       }}
     >
       {/* Background Effects */}
-      <div className="fixed top-0 left-0 w-full h-[50vh] bg-gradient-to-b from-[#000F80]/30 to-transparent pointer-events-none" />
+      <div className="fixed top-0 left-0 w-full h-[50vh] bg-gradient-to-b from-[#0C125C]/30 to-transparent pointer-events-none" />
       <div className="fixed top-[-20%] right-[-10%] w-[50%] h-[50%] bg-[#1B5BCC]/10 blur-[150px] pointer-events-none rounded-full" />
 
       <Header />
