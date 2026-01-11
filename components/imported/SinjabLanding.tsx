@@ -189,6 +189,18 @@ const Header = () => {
 
 // --- HERO SECTION ---
 const Hero = () => {
+  const [playerCount, setPlayerCount] = useState(120000);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Random fluctuation between 119,000 and 120,100
+      const newCount = Math.floor(Math.random() * (120100 - 119000 + 1)) + 119000;
+      setPlayerCount(newCount);
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const stats = [
     { value: '370+', label: 'Partner Clubs' },
     { value: '250k+', label: 'App Downloads' },
@@ -211,7 +223,15 @@ const Hero = () => {
             <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
           </span>
           <span className="text-sm text-gray-300">
-            <span className="text-white font-semibold">120,000+</span> players active this month
+            <motion.span 
+              key={playerCount}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="text-white font-semibold inline-block"
+            >
+              {playerCount.toLocaleString()}+
+            </motion.span> players active this month
           </span>
         </motion.div>
 
