@@ -289,13 +289,26 @@ const OdometerCounter = ({ value }: { value: number }) => {
 
 // --- HERO SECTION ---
 const Hero = () => {
-  const [playerCount, setPlayerCount] = useState(120500);
+  // Initialize with a random starting point between 120,000 and 121,000
+  const [playerCount, setPlayerCount] = useState(() => {
+    return Math.floor(Math.random() * (121000 - 120000 + 1)) + 120000;
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Random fluctuation between 120,000 and 121,000
-      const newCount = Math.floor(Math.random() * (121000 - 120000 + 1)) + 120000;
-      setPlayerCount(newCount);
+      setPlayerCount(prev => {
+        // Random change between 8-12 players
+        const change = Math.floor(Math.random() * 5) + 8; // 8 to 12
+        // Randomly decide to increase or decrease (slightly favor increase for growth feel)
+        const direction = Math.random() > 0.45 ? 1 : -1;
+        let newCount = prev + (change * direction);
+        
+        // Keep within reasonable bounds (soft limits)
+        if (newCount > 121500) newCount = prev - change;
+        if (newCount < 119500) newCount = prev + change;
+        
+        return newCount;
+      });
     }, 1500);
 
     return () => clearInterval(interval);
