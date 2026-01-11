@@ -73,7 +73,7 @@ const Header = () => {
             <img 
               src="/Logopluswordmark%20white%20no%20background.svg" 
               alt="Sinjab" 
-              className="h-10 w-auto group-hover:opacity-90 transition-opacity"
+              className="h-[35px] w-auto group-hover:opacity-90 transition-opacity"
             />
           </a>
 
@@ -165,10 +165,26 @@ const Header = () => {
                 ))}
                 <div className="pt-4 border-t border-white/10 space-y-2">
                   <a
-                    href="#"
-                    className="block w-full px-4 py-3 bg-white text-black text-sm font-bold rounded-xl text-center min-h-[44px]"
+                    href="https://apps.apple.com/us/app/setpoint-app/id1596309430"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-white text-black text-sm font-bold rounded-xl min-h-[44px]"
                   >
-                    Download App
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.08zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+                    </svg>
+                    App Store
+                  </a>
+                  <a
+                    href="https://play.google.com/store/apps/details?id=com.setpoint.android&hl=en&gl=US"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-white text-black text-sm font-bold rounded-xl min-h-[44px]"
+                  >
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z" />
+                    </svg>
+                    Google Play
                   </a>
                   <a
                     href="#pricing"
@@ -372,17 +388,30 @@ const Hero = () => {
           className="flex flex-col sm:flex-row gap-4 justify-center pt-4"
         >
           <a
-            href="#"
-            className="px-8 py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-100 transition-all min-h-[52px] flex items-center justify-center gap-2"
+            href="https://apps.apple.com/us/app/setpoint-app/id1596309430"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-6 py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-100 transition-all min-h-[52px] flex items-center justify-center gap-2"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
               <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.08zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
             </svg>
-            Download App
+            App Store
+          </a>
+          <a
+            href="https://play.google.com/store/apps/details?id=com.setpoint.android&hl=en&gl=US"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-6 py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-100 transition-all min-h-[52px] flex items-center justify-center gap-2"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z" />
+            </svg>
+            Google Play
           </a>
           <a
             href="#pricing"
-            className="px-8 py-4 bg-[#1B5BCC] text-white font-bold rounded-xl hover:bg-[#1B5BCC]/90 transition-all min-h-[52px] flex items-center justify-center"
+            className="px-6 py-4 bg-[#1B5BCC] text-white font-bold rounded-xl hover:bg-[#1B5BCC]/90 transition-all min-h-[52px] flex items-center justify-center"
           >
             Partner With Us
           </a>
@@ -455,7 +484,7 @@ const Feeds = () => {
 
 // --- B2B TRUST SECTION ---
 const B2BTrust = () => {
-  const partners = ["Monsha'at", 'Noon', 'Roshn', 'Leejam', 'WeBook'];
+  const partners = ["Monsha'at", 'Roshn', 'WeBook'];
 
   return (
     <div className="container mx-auto px-5 md:px-6">
@@ -464,7 +493,7 @@ const B2BTrust = () => {
           Trusted by Industry Leaders
         </h3>
         <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-12 w-full max-w-4xl">
+        <div className="grid grid-cols-3 gap-6 md:gap-12 w-full max-w-3xl">
           {partners.map((partner) => (
             <motion.div
               key={partner}
@@ -595,34 +624,55 @@ const Features = () => {
 const Pricing = () => {
   const tiers = [
     {
-      name: 'Starter',
-      tagline: 'Commission Only',
-      price: 'Free',
-      priceNote: '+ 15% per booking',
+      name: 'Basic',
+      tagline: 'Essential Management Tools',
+      priceSmall: '800',
+      priceLarge: '1,200',
+      commission: { strikethrough: '8%', actual: '4.9%' },
       features: [
-        'Unlimited bookings',
-        'Player app exposure',
-        'Basic analytics',
-        'Email support',
+        'Customizable Scheduling System',
+        'All-in-One Dashboard',
+        'Monthly Operations Reports',
+        'Integrated Invoicing System',
+        'Apple Pay & POS Support',
       ],
-      active: false,
-      cta: 'Get Started Free',
+      recommended: false,
+      comingSoon: false,
+      cta: 'Get Started',
+    },
+    {
+      name: 'Advanced',
+      tagline: 'Complete Business Solution',
+      priceSmall: '1,000',
+      priceLarge: '1,700',
+      commission: { strikethrough: '8%', actual: '4.9%' },
+      features: [
+        'Everything in Basic, plus:',
+        'Training Management',
+        'Advanced Booking Packages',
+        'Peak-hours Dynamic Pricing',
+        'Split Payment Engine',
+        'Built-in Accounting Software',
+        'Statistical Performance Tracking',
+      ],
+      recommended: true,
+      comingSoon: false,
+      cta: 'Get Started',
     },
     {
       name: 'Growth',
-      tagline: 'Subscription + Lower Commission',
-      price: '499',
-      priceNote: 'SAR/mo + 8% per booking',
+      tagline: 'Enterprise Features',
+      priceSmall: null,
+      priceLarge: null,
+      commission: null,
       features: [
-        'Everything in Starter',
-        'Dynamic pricing engine',
-        'Split payments',
-        'Advanced analytics',
-        'Priority support',
-        'Custom branding',
+        'Everything in Advanced, plus:',
+        'Full Tournament Management',
+        'Match Making Engine',
       ],
-      active: true,
-      cta: 'Start Growing',
+      recommended: false,
+      comingSoon: true,
+      cta: 'Coming Soon',
     },
   ];
 
@@ -637,7 +687,7 @@ const Pricing = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-3xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
         {tiers.map((tier) => (
           <motion.div
             key={tier.name}
@@ -645,15 +695,22 @@ const Pricing = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className={`relative p-6 md:p-8 rounded-2xl md:rounded-3xl border transition-all duration-500 ${
-              tier.active
+            className={`relative p-6 md:p-8 rounded-2xl md:rounded-3xl border transition-all duration-500 backdrop-blur-xl ${
+              tier.comingSoon
+                ? 'bg-white/5 border-white/10 grayscale opacity-60'
+                : tier.recommended
                 ? 'bg-[#1B5BCC]/10 border-[#1B5BCC]/50 shadow-[0_0_40px_rgba(27,91,204,0.15)]'
-                : 'bg-white/[0.02] border-white/10 hover:border-white/30'
+                : 'bg-white/5 border-white/10 hover:border-white/30'
             }`}
           >
-            {tier.active && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#1B5BCC] text-[10px] font-black uppercase tracking-widest rounded-full text-white">
-                Recommended
+            {tier.recommended && (
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#1B5BCC] text-[10px] font-black uppercase tracking-widest rounded-full text-white whitespace-nowrap">
+                Most Recommended
+              </div>
+            )}
+            {tier.comingSoon && (
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gray-600 text-[10px] font-black uppercase tracking-widest rounded-full text-white whitespace-nowrap">
+                Coming Soon
               </div>
             )}
 
@@ -662,24 +719,40 @@ const Pricing = () => {
                 {tier.name}
               </h4>
               <p className="text-[#E5E7EB] text-sm mb-4">{tier.tagline}</p>
-              <div className="flex items-baseline gap-1">
-                {tier.price === 'Free' ? (
-                  <span className="text-4xl font-black text-white">Free</span>
-                ) : (
-                  <>
-                    <span className="text-4xl font-black text-white">{tier.price}</span>
-                    <span className="text-gray-500 text-sm">SAR</span>
-                  </>
-                )}
-              </div>
-              <p className="text-xs text-gray-500 mt-1">{tier.priceNote}</p>
+              
+              {tier.comingSoon ? (
+                <div className="flex items-baseline gap-1">
+                  <span className="text-3xl font-black text-white">Coming Soon</span>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl font-black text-white">{tier.priceSmall}</span>
+                      <span className="text-gray-500 text-sm">SAR/mo</span>
+                      <span className="text-gray-500 text-xs ml-1">(≤3 courts)</span>
+                    </div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl font-black text-white">{tier.priceLarge}</span>
+                      <span className="text-gray-500 text-sm">SAR/mo</span>
+                      <span className="text-gray-500 text-xs ml-1">(&gt;3 courts)</span>
+                    </div>
+                  </div>
+                  {tier.commission && (
+                    <p className="text-xs text-gray-500 mt-3">
+                      Commission: <span className="line-through text-gray-600">{tier.commission.strikethrough}</span>{' '}
+                      <span className="text-[#1B5BCC] font-semibold">{tier.commission.actual}</span>
+                    </p>
+                  )}
+                </>
+              )}
             </div>
 
             <ul className="space-y-3 mb-8">
-              {tier.features.map((feature) => (
-                <li key={feature} className="flex items-center gap-3 text-sm text-[#E5E7EB]">
+              {tier.features.map((feature, idx) => (
+                <li key={feature} className={`flex items-center gap-3 text-sm text-[#E5E7EB] ${idx === 0 && feature.includes('Everything') ? 'font-semibold text-white' : ''}`}>
                   <svg
-                    className={`w-5 h-5 flex-shrink-0 ${tier.active ? 'text-[#1B5BCC]' : 'text-gray-600'}`}
+                    className={`w-5 h-5 flex-shrink-0 ${tier.recommended ? 'text-[#1B5BCC]' : tier.comingSoon ? 'text-gray-500' : 'text-gray-600'}`}
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -697,8 +770,11 @@ const Pricing = () => {
             </ul>
 
             <button
+              disabled={tier.comingSoon}
               className={`w-full py-4 font-bold rounded-xl transition-all min-h-[52px] ${
-                tier.active
+                tier.comingSoon
+                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : tier.recommended
                   ? 'bg-[#1B5BCC] text-white shadow-[0_0_20px_rgba(27,91,204,0.4)] hover:bg-[#1B5BCC]/90'
                   : 'bg-white/5 border border-white/10 hover:bg-white/10 text-white'
               }`}
@@ -875,7 +951,7 @@ export default function SinjabLanding() {
           <Features />
         </section>
 
-        <section id="pricing" className="py-16 md:py-32 bg-white/[0.01] border-y border-white/5">
+        <section id="pricing" className="py-16 md:py-32 border-y border-white/5">
           <Pricing />
         </section>
 

@@ -31,8 +31,26 @@ import {
   Coins,
   TriangleAlert,
   Wallet,
+  Server,
+  Layout,
+  Smartphone,
+  Database,
+  Lock,
+  FileCode,
+  CreditCard,
+  Zap,
+  BarChart3,
+  Palette,
+  MapPin,
+  Bell,
+  GitBranch,
+  Banknote,
+  Calendar,
+  Trophy,
+  Globe,
   type LucideIcon
 } from 'lucide-react';
+import { FinancialScenarioPlanner } from '@/components/dashboard/FinancialScenarioPlanner';
 import { 
   DATA_2024, 
   DATA_2025, 
@@ -78,11 +96,11 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-// Common props for MUI Charts - Light Mode
+// Common props for MUI Charts - Light Mode (Optimized spacing)
 // Note: hideLegend suppresses React DOM warnings from MUI's internal legend component
 const commonChartProps = {
   grid: { horizontal: true },
-  margin: { top: 20, bottom: 40, left: 80, right: 30 },
+  margin: { top: 10, bottom: 30, left: 60, right: 10 },
   hideLegend: true,
   sx: {
     '.MuiChartsAxis-tickLabel': { fill: `${THEME.accent.textSecondary} !important`, fontSize: 10 },
@@ -141,12 +159,19 @@ const NAV_ITEMS = [
 // --- COMPONENTS ---
 
 // Simple custom legend to avoid MUI's internal prop warnings
-const ChartLegend = ({ items }: { items: { label: string; color: string }[] }) => (
-  <div className="flex flex-wrap gap-4 mb-4">
+// Supports horizontal (default) and vertical (right-side) layout
+const ChartLegend = ({ items, layout = 'horizontal' }: { 
+  items: { label: string; color: string }[]; 
+  layout?: 'horizontal' | 'vertical';
+}) => (
+  <div className={layout === 'vertical' 
+    ? "flex flex-col gap-2 pl-4 border-l border-slate-100" 
+    : "flex flex-wrap gap-4 mb-4"
+  }>
     {items.map((item, idx) => (
       <div key={idx} className="flex items-center gap-2">
-        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: item.color }} />
-        <span className="text-xs text-slate-600">{item.label}</span>
+        <div className="w-3 h-3 rounded-sm flex-shrink-0" style={{ backgroundColor: item.color }} />
+        <span className="text-xs text-slate-600 whitespace-nowrap">{item.label}</span>
       </div>
     ))}
   </div>
@@ -228,51 +253,86 @@ const Sidebar = ({ activeSection }: { activeSection: string }) => {
   );
 };
 
-const ChartCard = ({ title, info, children, className = "" }: { 
-  title: string; 
-  info?: { calculation: string; source: string }; 
-  children: React.ReactNode; 
-  className?: string 
+const ChartCard = ({ title, info, children, className = "", legendItems, oneLiner }: {
+  title: string;
+  info?: { calculation: string; source: string };
+  children: React.ReactNode;
+  className?: string;
+  legendItems?: { label: string; color: string }[];
+  oneLiner?: string;
 }) => (
-  <motion.div 
-    initial={{ opacity: 0, y: 20 }} 
-    whileInView={{ opacity: 1, y: 0 }} 
-    viewport={{ once: true }}
-    className={`bg-white/70 backdrop-blur-sm border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:border-slate-300 transition-all ${className}`}
-  >
-    <div className="flex items-center justify-between mb-6">
-      <h3 className="text-base font-bold text-slate-900 flex items-center">
-        {title} 
-        {info && <InfoTooltip info={info} />}
-      </h3>
-    </div>
-    {children}
-  </motion.div>
-);
-
-const StatCard = ({ label, value, sub, icon: Icon, color }: { 
-  label: string; 
-  value: string; 
-  sub: string; 
-  icon: LucideIcon; 
-  color: string 
-}) => (
-  <motion.div 
+  <motion.div
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
-    className="bg-white/70 backdrop-blur-sm p-5 rounded-xl border border-slate-200 flex flex-col gap-3 hover:shadow-md hover:border-slate-300 transition-all"
+    className={`bg-white/70 backdrop-blur-sm border border-slate-200 rounded-2xl p-4 hover:shadow-lg hover:border-slate-300 transition-all ${className}`}
   >
-    <div className="flex justify-between items-start">
-      <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{label}</div>
-      <Icon className="w-5 h-5" style={{ color }} />
+    <div className="flex items-center justify-between mb-2">
+      <h3 className="text-sm font-bold text-slate-900 flex items-center">
+        {title}
+        {info && <InfoTooltip info={info} />}
+      </h3>
     </div>
-    <div>
-      <div className="text-2xl font-black text-slate-900">{value}</div>
-      <div className="text-xs text-slate-400 mt-1">{sub}</div>
+    <div className="flex gap-3">
+      <div className="flex-1 min-w-0">
+        {children}
+      </div>
+      {legendItems && legendItems.length > 0 && (
+        <ChartLegend items={legendItems} layout="vertical" />
+      )}
     </div>
+    {oneLiner && (
+      <div className="mt-2 pt-2 border-t border-slate-100 text-xs text-emerald-600">
+        {oneLiner}
+      </div>
+    )}
   </motion.div>
 );
+
+const StatCard = ({ label, value, sub, icon: Icon, color, trend, showOneLiner = true }: {
+  label: string;
+  value: string;
+  sub: string;
+  icon: LucideIcon;
+  color: string;
+  trend?: number;
+  showOneLiner?: boolean;
+}) => {
+  // Determine if this is a debt/liability card by label
+  const isDebtCard = label.toLowerCase().includes('debt') || 
+                     label.toLowerCase().includes('liabilit') ||
+                     label.toLowerCase().includes('loan') ||
+                     label.toLowerCase().includes('burn');
+  
+  const shouldShowOneLiner = showOneLiner && !isDebtCard && trend !== undefined;
+  const isPositive = trend !== undefined && trend >= 0;
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="bg-white/70 backdrop-blur-sm p-5 rounded-xl border border-slate-200 flex flex-col gap-3 hover:shadow-md hover:border-slate-300 transition-all"
+    >
+      <div className="flex justify-between items-start">
+        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{label}</div>
+        <Icon className="w-5 h-5" style={{ color }} />
+      </div>
+      <div>
+        <div className="text-2xl font-black text-slate-900">{value}</div>
+        <div className="text-xs text-slate-400 mt-1">{sub}</div>
+      </div>
+      {shouldShowOneLiner && (
+        <div className={`text-xs pt-2 border-t border-slate-100 ${isPositive ? 'text-emerald-600' : 'text-slate-500'}`}>
+          {isPositive 
+            ? `↑ Up ${Math.abs(trend).toFixed(1)}% from last period, signaling strong retention.`
+            : `↓ Down ${Math.abs(trend).toFixed(1)}% from last period, monitoring closely.`
+          }
+        </div>
+      )}
+    </motion.div>
+  );
+};
 
 const SectionHeader = ({ title, subtitle, id }: { title: string; subtitle: string; id: string }) => (
   <div id={id} className="scroll-mt-24 mb-10">
@@ -302,7 +362,7 @@ const OrgNode = ({
   title: string; 
   name?: string; 
   badge?: string; 
-  badgeColor?: 'blue' | 'gray' | 'amber';
+  badgeColor?: 'blue' | 'gray' | 'green';
   icon: LucideIcon; 
   color?: string;
   subtitle?: string;
@@ -310,17 +370,16 @@ const OrgNode = ({
 }) => {
   const colorClasses: Record<string, string> = {
     blue: 'bg-blue-50 border-blue-200 text-blue-700',
-    purple: 'bg-purple-50 border-purple-200 text-purple-700',
+    navy: 'bg-slate-100 border-slate-300 text-slate-800',
     green: 'bg-emerald-50 border-emerald-200 text-emerald-700',
-    orange: 'bg-orange-50 border-orange-200 text-orange-700',
     slate: 'bg-slate-50 border-slate-200 text-slate-700',
-    amber: 'bg-amber-50 border-amber-200 text-amber-700',
+    light: 'bg-white border-slate-200 text-slate-700',
   };
   
   const badgeColorClasses: Record<string, string> = {
     blue: 'bg-blue-500 text-white',
     gray: 'bg-slate-400 text-white',
-    amber: 'bg-amber-500 text-white',
+    green: 'bg-emerald-500 text-white',
   };
   
   return (
@@ -354,7 +413,7 @@ const OrganizationChart = () => (
   <div className="overflow-x-auto py-8">
     <div className="flex flex-col items-center min-w-[800px]">
       {/* CEO Level */}
-      <OrgNode title="CEO" name="Hassan" icon={Crown} color="amber" />
+      <OrgNode title="CEO" name="Hassan" icon={Crown} color="blue" />
       <OrgConnector />
       
       {/* Level 2 - Departments */}
@@ -383,7 +442,7 @@ const OrganizationChart = () => (
             title="Legal" 
             name="MZ Lawyers" 
             icon={Scale} 
-            color="purple"
+            color="slate"
             badge="2% Equity"
             badgeColor="blue"
           />
@@ -408,7 +467,7 @@ const OrganizationChart = () => (
           <OrgNode 
             title="Operations" 
             icon={Building} 
-            color="orange"
+            color="slate"
             badge="Vacant"
             badgeColor="gray"
           />
@@ -483,7 +542,7 @@ const MILESTONES = [
     description: 'Opening gate access for corporate partners to offer court bookings as employee benefits and wellness programs.',
     partners: ['Noon', 'Roshn', 'Aramco', 'Webook', 'Wafy', 'STC Bank', 'Walaa', 'AlAhli Bank', 'AlRajhi Bank'],
     icon: Briefcase,
-    color: 'purple',
+    color: 'blue',
     status: 'planned'
   },
   {
@@ -503,7 +562,7 @@ const MILESTONES = [
     description: 'Pre-purchasing club inventory for guaranteed liquidity in exchange for 100% booking revenue retention.',
     impact: '+30% Profit Margin Increase',
     icon: Coins,
-    color: 'amber',
+    color: 'slate',
     status: 'planned'
   }
 ];
@@ -512,9 +571,8 @@ const MilestoneCard = ({ milestone, index }: { milestone: typeof MILESTONES[0]; 
   const Icon = milestone.icon;
   const colorClasses: Record<string, { bg: string; border: string; icon: string; badge: string }> = {
     blue: { bg: 'bg-blue-50', border: 'border-blue-200', icon: 'text-blue-600', badge: 'bg-blue-100 text-blue-700' },
-    purple: { bg: 'bg-purple-50', border: 'border-purple-200', icon: 'text-purple-600', badge: 'bg-purple-100 text-purple-700' },
+    slate: { bg: 'bg-slate-50', border: 'border-slate-200', icon: 'text-slate-600', badge: 'bg-slate-100 text-slate-700' },
     green: { bg: 'bg-emerald-50', border: 'border-emerald-200', icon: 'text-emerald-600', badge: 'bg-emerald-100 text-emerald-700' },
-    amber: { bg: 'bg-amber-50', border: 'border-amber-200', icon: 'text-amber-600', badge: 'bg-amber-100 text-amber-700' },
   };
   const colors = colorClasses[milestone.color];
   
@@ -656,7 +714,7 @@ export default function InvestorRelations() {
                 >
                   <div className="flex items-center gap-2 mb-6">
                     <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                    <span className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Verified Data • Real-Time</span>
+                    <span className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Verified Data</span>
                   </div>
                   
                   <h1 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight">
@@ -739,7 +797,7 @@ export default function InvestorRelations() {
                   className="mb-12"
                 >
                   <h3 className="text-xl font-bold text-slate-900 mb-6">Strategic Evolution</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div className="relative bg-slate-50 border border-slate-200 rounded-xl p-5 hover:bg-slate-100 transition-all">
                       <div className="text-xs text-slate-600 uppercase tracking-wider mb-2 font-semibold">2022</div>
                       <div className="text-sm text-slate-700 leading-relaxed">MVP & Market Entry</div>
@@ -750,62 +808,26 @@ export default function InvestorRelations() {
                       <div className="text-sm text-slate-700 leading-relaxed">Hyper-Growth (Acquisition Phase)</div>
                       <div className="absolute top-3 right-3 w-2 h-2 bg-slate-400 rounded-full" />
                     </div>
-                    <div className="relative bg-emerald-50 border border-emerald-200 rounded-xl p-5 hover:bg-emerald-100 transition-all">
-                      <div className="text-xs text-emerald-700 uppercase tracking-wider mb-2 font-semibold">2024</div>
-                      <div className="text-sm text-slate-700 leading-relaxed">Market Leadership (28M SAR Run Rate)</div>
-                      <div className="absolute top-3 right-3 w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                    </div>
                     <div className="relative bg-slate-50 border border-slate-200 rounded-xl p-5 hover:bg-slate-100 transition-all">
-                      <div className="text-xs text-slate-600 uppercase tracking-wider mb-2 font-semibold">2025</div>
-                      <div className="text-sm text-slate-700 leading-relaxed">Financial Optimization & B2B Expansion</div>
+                      <div className="text-xs text-slate-600 uppercase tracking-wider mb-2 font-semibold">2024</div>
+                      <div className="text-sm text-slate-700 leading-relaxed">Market Leadership (28M SAR GMV)</div>
                       <div className="absolute top-3 right-3 w-2 h-2 bg-slate-400 rounded-full" />
                     </div>
+                    <div className="relative bg-emerald-50 border border-emerald-200 rounded-xl p-5 hover:bg-emerald-100 transition-all">
+                      <div className="text-xs text-emerald-700 uppercase tracking-wider mb-2 font-semibold">2025</div>
+                      <div className="text-sm text-slate-700 leading-relaxed">Financial Optimization</div>
+                      <div className="absolute top-3 right-3 w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                    </div>
+                    <div className="relative bg-blue-50 border border-blue-200 rounded-xl p-5 hover:bg-blue-100 transition-all">
+                      <div className="text-xs text-blue-700 uppercase tracking-wider mb-2 font-semibold">2026</div>
+                      <div className="text-sm text-slate-700 leading-relaxed">B2B Expansion & New Revenue Streams</div>
+                      <div className="absolute top-3 right-3 w-2 h-2 bg-blue-500 rounded-full" />
+                    </div>
                   </div>
                 </motion.div>
 
-                {/* Trust Bar - Partners */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7, duration: 0.6 }}
-                >
-                  <div className="text-center mb-6">
-                    <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wider">Trusted by Industry Leaders</h3>
-                  </div>
-                  <div className="flex flex-wrap items-center justify-center gap-4">
-                    {['Aramco', 'Roshn', 'STC Bank', 'AlRajhi Bank', 'Noon', 'Webook', 'Wala'].map((partner, idx) => (
-                      <div 
-                        key={partner}
-                        className="bg-white/70 backdrop-blur-xl border border-slate-200 rounded-xl px-6 py-3 hover:bg-white/90 hover:border-slate-300 hover:shadow-md transition-all"
-                      >
-                        <span className="text-sm font-semibold text-slate-700">{partner}</span>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-
-            {/* Financial Disclaimer */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.9 }}
-              className="bg-slate-50 border border-slate-200 rounded-xl p-5"
-            >
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-slate-600 flex-shrink-0 mt-0.5" />
-        <div>
-                  <div className="font-semibold text-slate-800 text-sm mb-1">Financial Disclaimer</div>
-                  <p className="text-slate-600 text-xs leading-relaxed">
-                    All financial data is sourced from verified bank statements and internal ledgers. 
-                    Ecosystem metrics are derived from the Investment Brief 2025. 
-                    Information is for informational purposes only and should not be construed as 
-                    investment advice. Confidential — For authorized investors only.
-                  </p>
                 </div>
-        </div>
-            </motion.div>
+            </div>
           </section>
           
           {/* ========== SECTION 2: FINANCIAL PERFORMANCE ========== */}
@@ -851,12 +873,16 @@ export default function InvestorRelations() {
 
             {/* Performance Overview Chart */}
             <div className="mb-8">
-              <ChartCard title="Performance Overview" info={CHART_INFO.performance}>
-                <ChartLegend items={[
+              <ChartCard 
+                title="Performance Overview" 
+                info={CHART_INFO.performance}
+                legendItems={[
                   { label: 'Revenue', color: THEME.accent.blue },
                   { label: 'Expenses', color: THEME.accent.grayDark },
-                ]} />
-                <div className="h-[320px] w-full">
+                ]}
+                oneLiner="↑ Revenue momentum sustained across all periods, demonstrating operational resilience."
+              >
+                <div className="h-[260px] w-full">
           <BarChart
             dataset={currentData}
                     xAxis={[{ scaleType: 'band', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 10 } }]}
@@ -873,8 +899,13 @@ export default function InvestorRelations() {
             
             {/* GMV & User Traction */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <ChartCard title="GMV Growth" info={CHART_INFO.gmv}>
-                <div className="h-[280px] w-full">
+              <ChartCard 
+                title="GMV Growth" 
+                info={CHART_INFO.gmv}
+                legendItems={[{ label: 'GMV (SAR)', color: THEME.accent.green }]}
+                oneLiner="↑ Gross merchandise value trending upward, reflecting market expansion."
+              >
+                <div className="h-[220px] w-full">
                   <LineChart
                     dataset={GMV_DATA}
                     xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
@@ -885,12 +916,16 @@ export default function InvestorRelations() {
                 </div>
               </ChartCard>
               
-              <ChartCard title="User Retention & Capacity" info={CHART_INFO.userTraction}>
-                <ChartLegend items={[
+              <ChartCard 
+                title="User Retention & Capacity" 
+                info={CHART_INFO.userTraction}
+                legendItems={[
                   { label: 'Active Users', color: THEME.accent.blue },
                   { label: 'New Users', color: THEME.accent.grayDark },
-                ]} />
-                <div className="h-[250px] w-full">
+                ]}
+                oneLiner="↑ Active user base growing steadily, indicating strong platform stickiness."
+              >
+                <div className="h-[220px] w-full">
                     <LineChart
                       dataset={USER_TRACTION_DATA}
                     xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
@@ -907,8 +942,13 @@ export default function InvestorRelations() {
 
             {/* Booking & Ticket Size */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <ChartCard title="Booking Volume" info={CHART_INFO.bookings}>
-                <div className="h-[280px] w-full">
+              <ChartCard 
+                title="Booking Volume" 
+                info={CHART_INFO.bookings}
+                legendItems={[{ label: 'Bookings', color: THEME.accent.blue }]}
+                oneLiner="↑ Booking frequency increasing, indicating improved user engagement."
+              >
+                <div className="h-[220px] w-full">
                       <BarChart
                       dataset={GMV_DATA}
                     xAxis={[{ scaleType: 'band', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 8 } }]}
@@ -919,8 +959,13 @@ export default function InvestorRelations() {
                 </div>
               </ChartCard>
               
-              <ChartCard title="Avg. Ticket Size" info={CHART_INFO.ticket}>
-                <div className="h-[280px] w-full">
+              <ChartCard 
+                title="Avg. Ticket Size" 
+                info={CHART_INFO.ticket}
+                legendItems={[{ label: 'SAR / Booking', color: THEME.accent.blue }]}
+                oneLiner="↑ Average transaction value stable, reflecting healthy pricing power."
+              >
+                <div className="h-[220px] w-full">
                       <LineChart
                       dataset={TICKET_SIZE_DATA}
                     xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
@@ -934,12 +979,16 @@ export default function InvestorRelations() {
 
             {/* Unit Economics & Costs */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <ChartCard title="Unit Economics" info={CHART_INFO.unitEconomics}>
-                <ChartLegend items={[
+              <ChartCard 
+                title="Unit Economics" 
+                info={CHART_INFO.unitEconomics}
+                legendItems={[
                   { label: 'Gross Revenue', color: THEME.accent.blue },
                   { label: 'Net Spread', color: THEME.accent.green },
-                ]} />
-                <div className="h-[250px] w-full">
+                ]}
+                oneLiner="↑ Net spread margins improving, demonstrating pricing power."
+              >
+                <div className="h-[200px] w-full">
                  <LineChart
                   dataset={TAKE_RATE_DATA}
                     xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
@@ -953,49 +1002,48 @@ export default function InvestorRelations() {
               </div>
               </ChartCard>
               
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }} 
-                whileInView={{ opacity: 1, y: 0 }} 
+<motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="bg-white/70 backdrop-blur-sm border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:border-slate-300 transition-all relative"
+                className="bg-white/70 backdrop-blur-sm border border-slate-200 rounded-2xl p-4 hover:shadow-lg hover:border-slate-300 transition-all relative"
               >
-                {/* Revision Alert Badge */}
-                <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-semibold border border-slate-300">
-                  <TriangleAlert className="w-3.5 h-3.5" />
-                  Subject to Revision
-            </div>
-
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-base font-bold text-slate-900 flex items-center">
-                    Cost Structure 
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center">
+                    Cost Structure
                     <InfoTooltip info={CHART_INFO.expenses} />
                   </h3>
                 </div>
-                <ChartLegend items={[
-                  { label: 'Payroll', color: THEME.accent.blue },
-                  { label: 'Tech', color: THEME.accent.grayDark },
-                  { label: 'Operations', color: THEME.accent.grayMedium },
-                ]} />
-                <div className="h-[230px] w-full">
-              <LineChart
-                    dataset={EXPENSE_HISTORY_CONSOLIDATED}
-                    xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
-                series={[
-                      { dataKey: 'payroll', label: 'Payroll', color: THEME.accent.blue, showMark: false },
-                      { dataKey: 'tech', label: 'Tech', color: THEME.accent.grayDark, showMark: false },
-                      { dataKey: 'ops', label: 'Ops', color: THEME.accent.grayMedium, showMark: false },
-                    ]}
-                    yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
-                {...commonChartProps}
-              />
-            </div>
+                <div className="flex gap-3">
+                  <div className="flex-1 h-[200px]">
+                    <LineChart
+                      dataset={EXPENSE_HISTORY_CONSOLIDATED}
+                      xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 9 } }]}
+                      series={[
+                        { dataKey: 'payroll', label: 'Payroll', color: THEME.accent.blue, showMark: false },
+                        { dataKey: 'tech', label: 'Tech', color: THEME.accent.grayDark, showMark: false },
+                        { dataKey: 'ops', label: 'Ops', color: THEME.accent.grayMedium, showMark: false },
+                      ]}
+                      yAxis={[{ tickLabelStyle: { fill: THEME.accent.textSecondary } }]}
+                      {...commonChartProps}
+                    />
+                  </div>
+                  <ChartLegend 
+                    items={[
+                      { label: 'Payroll', color: THEME.accent.blue },
+                      { label: 'Tech', color: THEME.accent.grayDark },
+                      { label: 'Operations', color: THEME.accent.grayMedium },
+                    ]} 
+                    layout="vertical" 
+                  />
+                </div>
           </motion.div>
             </div>
             
             {/* Debt Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               <ChartCard title="Debt Trajectory" info={CHART_INFO.debt} className="lg:col-span-2">
-                <div className="h-[280px] w-full">
+                <div className="h-[220px] w-full">
                   <LineChart
                     dataset={DEBT_BALANCE_HISTORY}
                     xAxis={[{ scaleType: 'point', dataKey: 'month', tickLabelStyle: { fill: THEME.accent.textSecondary, fontSize: 10 } }]}
@@ -1148,43 +1196,429 @@ export default function InvestorRelations() {
             <SectionHeader 
               id="tech-header"
               title="Tech Architecture" 
-              subtitle="System infrastructure and code structure."
+              subtitle="Financial Command Center — System infrastructure powering our platform."
+            />
+            
+            {/* Three Column Architecture Cards */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              {/* Column 1: The Core (Backend Engine) */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0 }}
+                className="bg-white/60 backdrop-blur-xl border border-slate-200/80 rounded-2xl p-8 relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full -translate-y-1/2 translate-x-1/2" />
+                
+                <div className="relative z-10">
+                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/20">
+                    <Server className="w-7 h-7 text-white" />
+                  </div>
+                  
+                  <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-2">The Core</p>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Modular Monolith API</h3>
+                  <p className="text-sm text-slate-500 mb-6">Laravel 8.54 Framework [PHP 8.0]</p>
+                  
+                  <div className="space-y-4">
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Key Capabilities</p>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Lock className="w-4 h-4 text-slate-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-700">Security</p>
+                          <p className="text-xs text-slate-500">Laravel Sanctum (Token-based Auth)</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <FileCode className="w-4 h-4 text-slate-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-700">Docs</p>
+                          <p className="text-xs text-slate-500">Swagger UI (Automated API Documentation)</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <CreditCard className="w-4 h-4 text-slate-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-700">Payments</p>
+                          <p className="text-xs text-slate-500">HyperPay & Apple Pay Integration</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Database className="w-4 h-4 text-slate-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-700">Modules</p>
+                          <p className="text-xs text-slate-500">Booking Engine, POS System, Tournament Logic</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Column 2: The Interface (Web Platform) */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="bg-white/60 backdrop-blur-xl border border-slate-200/80 rounded-2xl p-8 relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-full -translate-y-1/2 translate-x-1/2" />
+                
+                <div className="relative z-10">
+                  <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/20">
+                    <Layout className="w-7 h-7 text-white" />
+                  </div>
+                  
+                  <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wider mb-2">The Interface</p>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Investor & Club Dashboard</h3>
+                  <p className="text-sm text-slate-500 mb-6">Next.js 15 (App Router)</p>
+                  
+                  <div className="space-y-4">
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Key Capabilities</p>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Zap className="w-4 h-4 text-slate-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-700">Performance</p>
+                          <p className="text-xs text-slate-500">Server-Side Rendering (SSR) for speed</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <BarChart3 className="w-4 h-4 text-slate-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-700">Visuals</p>
+                          <p className="text-xs text-slate-500">Recharts/MUI X for real-time financial plotting</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Palette className="w-4 h-4 text-slate-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-700">Styling</p>
+                          <p className="text-xs text-slate-500">Tailwind CSS for responsive dark mode</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Column 3: The Reach (Native Mobile Apps) */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="bg-white/60 backdrop-blur-xl border border-slate-200/80 rounded-2xl p-8 relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-slate-500/10 to-transparent rounded-full -translate-y-1/2 translate-x-1/2" />
+                
+                <div className="relative z-10">
+                  <div className="w-14 h-14 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-slate-500/20">
+                    <Smartphone className="w-7 h-7 text-white" />
+                  </div>
+                  
+                  <p className="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">The Reach</p>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Player & Social App</h3>
+                  <p className="text-sm text-slate-500 mb-6">Native Android (Java/Kotlin) & Native iOS (Swift)</p>
+                  
+                  <div className="space-y-4">
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Key Capabilities</p>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Cpu className="w-4 h-4 text-slate-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-700">Performance</p>
+                          <p className="text-xs text-slate-500">Hardware-accelerated native performance</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Bell className="w-4 h-4 text-slate-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-700">Engagement</p>
+                          <p className="text-xs text-slate-500">Firebase Cloud Messaging (Push Notifications)</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <MapPin className="w-4 h-4 text-slate-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-700">Features</p>
+                          <p className="text-xs text-slate-500">GPS Location Services & Social Feeds</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Footer Note */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="bg-gradient-to-r from-slate-100 to-blue-50 border border-slate-200 rounded-xl p-6 text-center"
+            >
+              <p className="text-slate-600 text-sm">
+                System processes <span className="text-slate-900 font-bold">~28M SAR GMV</span> annually with <span className="text-emerald-600 font-bold">99.9% uptime</span> architecture.
+              </p>
+            </motion.div>
+          </section>
+
+          {/* ========== SECTION 4.5: ENTERPRISE SYSTEM FLOW ========== */}
+          <section id="system-flow" className="py-24">
+            <SectionHeader 
+              id="system-flow-header"
+              title="Enterprise System Flow" 
+              subtitle="Unified architecture powering seamless operations across all platforms."
             />
             
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 rounded-2xl p-12 text-center relative overflow-hidden"
+              className="relative"
             >
-              {/* Background pattern */}
-              <div className="absolute inset-0 opacity-5">
-                <div className="absolute inset-0" style={{ 
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                }} />
+{/* THE CORE - Central Node */}
+              <div className="flex flex-col items-center mb-8">
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  viewport={{ once: true }}
+                  className="bg-gradient-to-br from-blue-50 to-slate-50 rounded-2xl p-6 text-center shadow-lg border border-blue-200 max-w-md w-full"
+                >
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/20">
+                    <GitBranch className="w-8 h-8 text-white" />
+                  </div>
+                  <p className="text-blue-600 text-xs font-semibold uppercase tracking-wider mb-1">The Core</p>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Unified Modular API Engine</h3>
+                  <p className="text-slate-500 text-sm">Laravel 8 • PHP 8.0</p>
+                </motion.div>
               </div>
-              
-              <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
-                  <Construction className="w-4 h-4" />
-                  Under Construction
+
+              {/* Connector Lines */}
+              <div className="flex justify-center mb-4">
+                <div className="w-px h-8 bg-gradient-to-b from-blue-300 to-slate-300"></div>
+              </div>
+              <div className="flex justify-center mb-4">
+                <div className="flex items-center gap-0">
+                  <div className="w-[200px] lg:w-[280px] h-px bg-slate-300"></div>
+                  <div className="w-3 h-3 rounded-full bg-slate-400"></div>
+                  <div className="w-[200px] lg:w-[280px] h-px bg-slate-300"></div>
                 </div>
-                
-                <Code2 className="w-20 h-20 text-slate-300 mx-auto mb-6" />
-                
-                <h3 className="text-2xl font-bold text-slate-900 mb-3">Code Structure Documentation</h3>
-                <p className="text-slate-500 max-w-md mx-auto mb-8">
-                  Detailed technical architecture, API documentation, and infrastructure diagrams 
-                  are currently being prepared.
-                </p>
-                
-                <div className="flex flex-wrap justify-center gap-3">
-                  {['Next.js 15', 'React 19', 'TypeScript', 'PostgreSQL', 'Redis', 'AWS'].map((tech) => (
-                    <span key={tech} className="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-sm text-slate-600 font-medium">
-                      {tech}
-                    </span>
-                  ))}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="flex justify-center">
+                  <div className="w-px h-8 bg-slate-300"></div>
                 </div>
+                <div className="flex justify-center">
+                  <div className="w-px h-8 bg-slate-300"></div>
+                </div>
+                <div className="flex justify-center">
+                  <div className="w-px h-8 bg-slate-300"></div>
+                </div>
+              </div>
+
+              {/* Sub-Nodes - 3 Branches */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                {/* Financials */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
+                  className="bg-white/60 backdrop-blur-xl border border-slate-200/80 rounded-xl p-5 shadow-sm"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                      <Banknote className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Module</p>
+                      <h4 className="font-bold text-slate-900">Financials</h4>
+                    </div>
+                  </div>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2 text-sm text-slate-600">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                      Automated Club Settlements
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-slate-600">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                      HyperPay Gateway Integration
+                    </li>
+                  </ul>
+                </motion.div>
+
+                {/* Operations */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                  className="bg-white/60 backdrop-blur-xl border border-slate-200/80 rounded-xl p-5 shadow-sm"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-gradient-to-br from-slate-500 to-slate-600 rounded-lg flex items-center justify-center shadow-lg shadow-slate-500/20">
+                      <Calendar className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Module</p>
+                      <h4 className="font-bold text-slate-900">Operations</h4>
+                    </div>
+                  </div>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2 text-sm text-slate-600">
+                      <div className="w-1.5 h-1.5 rounded-full bg-slate-500"></div>
+                      Booking Engine
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-slate-600">
+                      <div className="w-1.5 h-1.5 rounded-full bg-slate-500"></div>
+                      POS System
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-slate-600">
+                      <div className="w-1.5 h-1.5 rounded-full bg-slate-500"></div>
+                      Court Management
+                    </li>
+                  </ul>
+                </motion.div>
+
+                {/* Engagement */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-white/60 backdrop-blur-xl border border-slate-200/80 rounded-xl p-5 shadow-sm"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
+                      <Trophy className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider">Module</p>
+                      <h4 className="font-bold text-slate-900">Engagement</h4>
+                    </div>
+                  </div>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2 text-sm text-slate-600">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                      Tournament Logic
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-slate-600">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                      Academy Modules
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-slate-600">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                      Ranking Systems
+                    </li>
+                  </ul>
+                </motion.div>
+              </div>
+
+              {/* API Connection Indicator */}
+              <div className="flex justify-center mb-4">
+                <div className="flex items-center gap-3 bg-slate-100 rounded-full px-4 py-2">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                  <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">API Layer</span>
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                </div>
+              </div>
+
+              {/* Connector to Delivery */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="flex justify-center">
+                  <div className="w-px h-8 bg-slate-300"></div>
+                </div>
+                <div className="flex justify-center">
+                  <div className="w-px h-8 bg-slate-300"></div>
+                </div>
+              </div>
+
+              {/* THE DELIVERY - End Nodes */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Investor/Club Dashboard */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 }}
+                  className="bg-gradient-to-br from-blue-50 to-slate-50 rounded-xl p-6 border border-blue-200 shadow-sm hover:shadow-md transition-all"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 flex-shrink-0">
+                      <Globe className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-blue-600 text-xs font-semibold uppercase tracking-wider mb-1">The Delivery</p>
+                      <h4 className="text-lg font-bold text-slate-900 mb-1">Investor & Club Dashboard</h4>
+                      <p className="text-slate-500 text-sm mb-3">Next.js 15 High-Performance Web</p>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">SSR</span>
+                        <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">Real-time Charts</span>
+                        <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">Dark Mode</span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Player Experience */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5 }}
+                  className="bg-gradient-to-br from-emerald-50 to-slate-50 rounded-xl p-6 border border-emerald-200 shadow-sm hover:shadow-md transition-all"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 flex-shrink-0">
+                      <Smartphone className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-emerald-600 text-xs font-semibold uppercase tracking-wider mb-1">The Delivery</p>
+                      <h4 className="text-lg font-bold text-slate-900 mb-1">Player Experience</h4>
+                      <p className="text-slate-500 text-sm mb-3">Native Mobile Infrastructure (Android/iOS)</p>
+                      <div className="flex items-center gap-2">
+                        <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-semibold">
+                          326k+ Annual Bookings
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
             </motion.div>
           </section>
@@ -1204,50 +1638,15 @@ export default function InvestorRelations() {
             </div>
           </section>
           
-          {/* ========== SECTION 6: FUTURE PROJECTIONS ========== */}
+{/* ========== SECTION 6: FUTURE PROJECTIONS ========== */}
           <section id="projections" className="py-24">
-            <SectionHeader 
+            <SectionHeader
               id="projections-header"
-              title="Future Projections" 
-              subtitle="Financial modeling and growth scenarios."
+              title="Future Projections"
+              subtitle="Interactive financial modeling and growth scenario planning."
             />
-            
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 rounded-2xl p-12 text-center relative overflow-hidden"
-            >
-              {/* Background pattern */}
-              <div className="absolute inset-0 opacity-5">
-                <div className="absolute inset-0" style={{ 
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E")`,
-                }} />
-              </div>
-              
-              <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
-                  <Hourglass className="w-4 h-4" />
-                  Coming Soon
-                </div>
-                
-                <TrendingUp className="w-20 h-20 text-slate-300 mx-auto mb-6" />
-                
-                <h3 className="text-2xl font-bold text-slate-900 mb-3">Financial Projections</h3>
-                <p className="text-slate-500 max-w-lg mx-auto mb-8">
-                  Financial modeling based on the implementation of the Road to Profitability strategy. 
-                  Detailed revenue forecasts, break-even analysis, and growth scenarios are being prepared.
-                </p>
-                
-                <div className="flex flex-wrap justify-center gap-3">
-                  {['Revenue Forecast', 'Break-Even Analysis', 'Growth Scenarios', 'Cash Flow Projections'].map((item) => (
-                    <span key={item} className="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-sm text-slate-600 font-medium">
-                      {item}
-                    </span>
-                ))}
-              </div>
-            </div>
-          </motion.div>
+
+            <FinancialScenarioPlanner />
           </section>
           
           {/* Footer */}
