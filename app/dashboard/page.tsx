@@ -411,7 +411,7 @@ const OrgConnector = ({ type = 'vertical' }: { type?: 'vertical' | 'horizontal' 
 
 const OrganizationChart = () => (
   <div className="overflow-x-auto py-8">
-    <div className="flex flex-col items-center min-w-[800px]">
+    <div className="flex flex-col items-center min-w-[900px]">
       {/* CEO Level */}
       <OrgNode title="CEO" name="Hassan" icon={Crown} color="blue" />
       <OrgConnector />
@@ -421,47 +421,89 @@ const OrganizationChart = () => (
         {/* Horizontal connector line */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[calc(100%-80px)] h-0.5 bg-slate-300" />
         
-        {/* Finance */}
-        <div className="flex flex-col items-center pt-8">
-          <div className="w-0.5 h-8 bg-slate-300 -mt-8" />
-          <OrgNode 
-            title="Finance & HR" 
-            name="Omar" 
-            icon={Briefcase} 
-            color="blue"
-            subtitle="4 Employees"
-            badge="Partner"
-            badgeColor="blue"
-          />
+        {/* Departments to be consolidated under Strategic Investor */}
+        <div className="flex flex-col items-center">
+          <div className="flex items-start gap-4 relative">
+            {/* Inner horizontal connector */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[calc(100%-40px)] h-0.5 bg-slate-300" />
+            
+            {/* Finance */}
+            <div className="flex flex-col items-center pt-8">
+              <div className="w-0.5 h-8 bg-slate-300 -mt-8" />
+              <OrgNode 
+                title="Finance & HR" 
+                name="Omar" 
+                icon={Briefcase} 
+                color="blue"
+                subtitle="4 Employees"
+                badge="Partner"
+                badgeColor="blue"
+              />
+            </div>
+            
+            {/* Legal */}
+            <div className="flex flex-col items-center pt-8">
+              <div className="w-0.5 h-8 bg-slate-300 -mt-8" />
+              <OrgNode 
+                title="Legal" 
+                name="MZ Lawyers" 
+                icon={Scale} 
+                color="slate"
+                badge="2% Equity"
+                badgeColor="blue"
+              />
+            </div>
+            
+            {/* Tech */}
+            <div className="flex flex-col items-center pt-8">
+              <div className="w-0.5 h-8 bg-slate-300 -mt-8" />
+              <OrgNode 
+                title="Tech / Dev" 
+                name="NextGeni" 
+                icon={Monitor} 
+                color="green"
+                badge="Partner"
+                badgeColor="blue"
+              />
+            </div>
+          </div>
+          
+          {/* Connector lines merging to Strategic Investor */}
+          <div className="relative w-full flex justify-center mt-4">
+            {/* Three vertical lines going down */}
+            <div className="absolute left-[calc(50%-168px)] w-0.5 h-6 bg-blue-300" />
+            <div className="absolute left-1/2 -translate-x-1/2 w-0.5 h-6 bg-blue-300" />
+            <div className="absolute right-[calc(50%-168px)] w-0.5 h-6 bg-blue-300" />
+            {/* Horizontal line connecting them */}
+            <div className="absolute top-6 left-[calc(50%-168px)] w-[336px] h-0.5 bg-blue-300" />
+            {/* Single line going down to investor card */}
+            <div className="absolute top-6 left-1/2 -translate-x-1/2 w-0.5 h-8 bg-blue-300" />
+          </div>
+          
+          {/* Strategic Investor Card */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="mt-14 relative"
+          >
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-[9px] font-bold px-3 py-1 rounded-full uppercase tracking-wider whitespace-nowrap">
+              Post-Investment Transition
+            </div>
+            <div className="bg-gradient-to-br from-blue-50 to-slate-50 border-2 border-blue-300 border-dashed rounded-xl p-5 text-center min-w-[220px]">
+              <Building className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+              <div className="font-bold text-slate-900 text-sm">Strategic Investor&apos;s Company</div>
+              <div className="text-xs text-slate-500 mt-1">Consolidated Services</div>
+              <div className="flex justify-center gap-1 mt-3">
+                <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[10px]">Finance</span>
+                <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px]">Legal</span>
+                <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[10px]">Tech</span>
+              </div>
+            </div>
+          </motion.div>
         </div>
         
-        {/* Legal */}
-        <div className="flex flex-col items-center pt-8">
-          <div className="w-0.5 h-8 bg-slate-300 -mt-8" />
-          <OrgNode 
-            title="Legal" 
-            name="MZ Lawyers" 
-            icon={Scale} 
-            color="slate"
-            badge="2% Equity"
-            badgeColor="blue"
-          />
-        </div>
-        
-        {/* Tech */}
-        <div className="flex flex-col items-center pt-8">
-          <div className="w-0.5 h-8 bg-slate-300 -mt-8" />
-          <OrgNode 
-            title="Tech / Dev" 
-            name="NextGeni" 
-            icon={Monitor} 
-            color="green"
-            badge="Partner"
-            badgeColor="blue"
-          />
-        </div>
-        
-        {/* Operations */}
+        {/* Operations - Stays with Sinjab */}
         <div className="flex flex-col items-center pt-8">
           <div className="w-0.5 h-8 bg-slate-300 -mt-8" />
           <OrgNode 

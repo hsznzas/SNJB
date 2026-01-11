@@ -38,20 +38,28 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.title}`,
   },
   description: siteConfig.description,
+  keywords: ['padel', 'sports management', 'Saudi Arabia', 'KSA', 'booking', 'courts', 'tennis', 'sports platform'],
+  authors: [{ name: 'Sinjab' }],
+  creator: 'Sinjab',
+  publisher: 'Sinjab',
   openGraph: {
     title: siteConfig.title,
     description: siteConfig.description,
-    url: './',
+    url: siteConfig.siteUrl,
     siteName: siteConfig.title,
-    images: [siteConfig.socialBanner],
+    images: [
+      {
+        url: siteConfig.socialBanner,
+        width: 1200,
+        height: 630,
+        alt: 'Sinjab - KSA Leading Sport Management Platform',
+      },
+    ],
     locale: 'en_US',
     type: 'website',
   },
   alternates: {
-    canonical: './',
-    types: {
-      'application/rss+xml': `${siteConfig.siteUrl}/feed.xml`,
-    },
+    canonical: siteConfig.siteUrl,
   },
   robots: {
     index: true,
@@ -66,8 +74,15 @@ export const metadata: Metadata = {
   },
   twitter: {
     title: siteConfig.title,
+    description: siteConfig.description,
     card: 'summary_large_image',
     images: [siteConfig.socialBanner],
+    creator: '@sinjabapp',
+  },
+  icons: {
+    icon: '/static/favicons/favicon.ico',
+    shortcut: '/static/favicons/favicon-16x16.png',
+    apple: '/static/favicons/apple-touch-icon.png',
   },
 };
 
@@ -112,21 +127,19 @@ export default function RootLayout({
         <link
           rel="mask-icon"
           href="/static/favicons/safari-pinned-tab.svg"
-          color="#5bbad5"
+          color="#3b82f6"
         />
-        <meta name="generator" content="Shipixen" />
-        <meta name="msapplication-TileColor" content="#000000" />
+        <meta name="msapplication-TileColor" content="#3b82f6" />
         <meta
           name="theme-color"
           media="(prefers-color-scheme: light)"
-          content="#fff"
+          content="#ffffff"
         />
         <meta
           name="theme-color"
           media="(prefers-color-scheme: dark)"
-          content="#000"
+          content="#0f172a"
         />
-        <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
       </head>
 
       <body className="flex flex-col bg-white text-black antialiased dark:bg-gray-950 dark:text-white min-h-screen">
