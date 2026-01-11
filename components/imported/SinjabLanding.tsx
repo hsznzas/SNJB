@@ -73,7 +73,7 @@ const Header = () => {
             <img 
               src="/Logopluswordmark%20white%20no%20background.svg" 
               alt="Sinjab" 
-              className="h-8 w-auto group-hover:opacity-90 transition-opacity"
+              className="h-10 w-auto group-hover:opacity-90 transition-opacity"
             />
           </a>
 
