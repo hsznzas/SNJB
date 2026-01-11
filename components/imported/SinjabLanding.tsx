@@ -1,182 +1,326 @@
-
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
- * SINJAB PREMIUM FINTECH LANDING PAGE
+ * SINJAB SPORTS TECH LANDING PAGE
+ * Mobile-First, High-Performance Design
  * Next.js 14 App Router Compatible
- * Dependencies: framer-motion, lucide-react (optional), tailwindcss
+ * Dependencies: framer-motion, tailwindcss
  */
 
-// --- COMPONENTS ---
+// --- THEME CONSTANTS ---
+const COLORS = {
+  navyDeep: '#000F80',
+  black: '#000000',
+  sinjabBlue: '#1B5BCC',
+  white: '#FFFFFF',
+  lightGray: '#E5E7EB',
+};
 
+// --- NAV ITEMS ---
+const NAV_ITEMS = [
+  { id: 'hero', label: 'Home' },
+  { id: 'feeds', label: 'Updates' },
+  { id: 'b2b', label: 'Partners' },
+  { id: 'features', label: 'Features' },
+  { id: 'pricing', label: 'Pricing' },
+  { id: 'faq', label: 'FAQ' },
+];
+
+// --- HEADER WITH SCROLL SPY ---
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState('hero');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+
+      // Scroll spy logic
+      const sections = NAV_ITEMS.map((item) => document.getElementById(item.id));
+      const scrollPosition = window.scrollY + 150;
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = sections[i];
+        if (section && section.offsetTop <= scrollPosition) {
+          setActiveSection(NAV_ITEMS[i].id);
+          break;
+        }
+      }
+    };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks = [
-    { name: 'Hero', href: '#hero' },
-    { name: 'Feeds', href: '#feeds' },
-    { name: 'B2B', href: '#b2b' },
-    { name: 'Features', href: '#features' },
-    { name: 'Pricing', href: '#pricing' },
-    { name: 'FAQ', href: '#faq' },
-  ];
-
   return (
-    <header className="fixed top-8 left-0 right-0 z-50 px-4">
-      <motion.nav 
+    <header className="fixed top-0 left-0 right-0 z-50">
+      <motion.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className={`max-w-fit mx-auto rounded-full px-2 py-2 flex items-center gap-2 md:gap-8 shadow-2xl transition-all duration-500 ${
-          scrolled ? 'bg-black/60 backdrop-blur-xl border border-white/10' : 'bg-white/5 backdrop-blur-md border border-white/5'
+        className={`w-full px-4 md:px-8 py-3 md:py-4 transition-all duration-500 ${
+          scrolled
+            ? 'bg-black/80 backdrop-blur-xl border-b border-white/10'
+            : 'bg-transparent'
         }`}
       >
-        <div className="flex items-center gap-2 px-4 py-1.5 bg-white/5 rounded-full border border-white/10 group cursor-pointer hover:bg-white/10 transition-all">
-          <div className="w-5 h-5 bg-blue-500 rounded-sm rotate-45 group-hover:rotate-90 transition-transform duration-500" />
-          <span className="font-bold text-lg tracking-tight text-white">Sinjab</span>
-        </div>
-        
-        <div className="hidden md:flex items-center gap-6">
-          {navLinks.map((link) => (
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Logo */}
+          <a href="#hero" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 bg-[#1B5BCC] rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+            </div>
+            <span className="font-bold text-xl tracking-tight text-white">Sinjab</span>
+          </a>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-1 bg-white/5 rounded-full p-1 border border-white/10">
+            {NAV_ITEMS.map((item) => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                className="relative px-4 py-2 text-sm font-medium transition-colors"
+              >
+                {activeSection === item.id && (
+                  <motion.div
+                    layoutId="activeSection"
+                    className="absolute inset-0 bg-[#1B5BCC] rounded-full"
+                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                  />
+                )}
+                <span
+                  className={`relative z-10 ${
+                    activeSection === item.id ? 'text-white' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  {item.label}
+                </span>
+              </a>
+            ))}
+          </div>
+
+          {/* Desktop CTA */}
+          <div className="hidden md:flex items-center gap-3">
             <a
-              key={link.name}
-              href={link.href}
-              className="text-sm font-medium text-gray-400 hover:text-white transition-colors duration-200"
+              href="#pricing"
+              className="px-5 py-2.5 bg-[#1B5BCC] text-white text-sm font-bold rounded-full hover:bg-[#1B5BCC]/90 transition-all min-h-[44px] flex items-center"
             >
-              {link.name}
+              Partner With Us
             </a>
-          ))}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden w-11 h-11 flex items-center justify-center bg-white/10 rounded-full"
+            aria-label="Toggle menu"
+          >
+            <div className="w-5 h-4 flex flex-col justify-between">
+              <span
+                className={`block h-0.5 bg-white transition-transform ${
+                  mobileMenuOpen ? 'rotate-45 translate-y-1.5' : ''
+                }`}
+              />
+              <span
+                className={`block h-0.5 bg-white transition-opacity ${
+                  mobileMenuOpen ? 'opacity-0' : ''
+                }`}
+              />
+              <span
+                className={`block h-0.5 bg-white transition-transform ${
+                  mobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''
+                }`}
+              />
+            </div>
+          </button>
         </div>
 
-        <button className="bg-white text-black text-sm font-bold px-5 py-2.5 rounded-full hover:bg-gray-200 transition-all active:scale-95 shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-          Partners
-        </button>
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden mt-4 bg-black/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden"
+            >
+              <div className="p-4 space-y-2">
+                {NAV_ITEMS.map((item) => (
+                  <a
+                    key={item.id}
+                    href={`#${item.id}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                      activeSection === item.id
+                        ? 'bg-[#1B5BCC] text-white'
+                        : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+                <div className="pt-4 border-t border-white/10 space-y-2">
+                  <a
+                    href="#"
+                    className="block w-full px-4 py-3 bg-white text-black text-sm font-bold rounded-xl text-center min-h-[44px]"
+                  >
+                    Download App
+                  </a>
+                  <a
+                    href="#pricing"
+                    className="block w-full px-4 py-3 bg-[#1B5BCC] text-white text-sm font-bold rounded-xl text-center min-h-[44px]"
+                  >
+                    Partner With Us
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.nav>
     </header>
   );
 };
 
+// --- HERO SECTION ---
 const Hero = () => {
+  const stats = [
+    { value: '370+', label: 'Partner Clubs' },
+    { value: '250k+', label: 'App Downloads' },
+    { value: '20+', label: 'Cities Covered' },
+    { value: '90%', label: 'Padel Market Share' },
+  ];
+
   return (
-    <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[80vh]">
-      <motion.div 
-        initial={{ opacity: 0, x: -50 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        viewport={{ once: true }}
-        className="space-y-8 text-center lg:text-left"
-      >
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-xs font-bold uppercase tracking-widest">
-          <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
-          v4.0 Live Now
-        </div>
-        
-        <h1 className="text-5xl md:text-8xl font-black tracking-tight leading-[1.05] text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/40">
-          Integrated Value.<br />
-          Scalable Growth.
-        </h1>
-        
-        <p className="text-gray-400 text-xl max-w-xl leading-relaxed mx-auto lg:mx-0">
-          The all-in-one financial operating system for modern teams. Consolidate your banking, treasury, and accounting into one high-performance interface.
-        </p>
-        
-        <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-          <button className="relative group px-8 py-4 bg-white text-black font-bold rounded-xl overflow-hidden hover:scale-[1.02] transition-all">
+    <div className="container mx-auto px-5 md:px-6 pt-24 md:pt-32 pb-16">
+      <div className="max-w-4xl mx-auto text-center space-y-8">
+        {/* Live Indicator */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-full"
+        >
+          <span className="relative flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+          </span>
+          <span className="text-sm text-gray-300">
+            <span className="text-white font-semibold">120,000+</span> players active this month
+          </span>
+        </motion.div>
+
+        {/* Headline */}
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+          className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight leading-[1.1] text-white"
+        >
+          The Operating System for{' '}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1B5BCC] to-blue-400">
+            Modern Sports Clubs
+          </span>
+        </motion.h1>
+
+        {/* Subheadline */}
+        <motion.p
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.8 }}
+          className="text-lg md:text-xl text-[#E5E7EB] max-w-2xl mx-auto leading-relaxed"
+        >
+          Manage bookings, maximize court utilization, and connect with Saudi Arabia&apos;s largest
+          community of players.
+        </motion.p>
+
+        {/* CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
+          className="flex flex-col sm:flex-row gap-4 justify-center pt-4"
+        >
+          <a
+            href="#"
+            className="px-8 py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-100 transition-all min-h-[52px] flex items-center justify-center gap-2"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.08zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+            </svg>
             Download App
-          </button>
-          
-          <button className="px-8 py-4 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold rounded-xl transition-all">
-            Watch Demo
-          </button>
-        </div>
+          </a>
+          <a
+            href="#pricing"
+            className="px-8 py-4 bg-[#1B5BCC] text-white font-bold rounded-xl hover:bg-[#1B5BCC]/90 transition-all min-h-[52px] flex items-center justify-center"
+          >
+            Partner With Us
+          </a>
+        </motion.div>
 
-        <div className="flex items-center justify-center lg:justify-start gap-8 pt-8">
-          <div className="space-y-1 text-white">
-            <div className="text-2xl font-bold">120K+</div>
-            <div className="text-xs text-gray-500 uppercase tracking-wider font-bold">Active Nodes</div>
-          </div>
-          <div className="w-px h-10 bg-white/10" />
-          <div className="space-y-1 text-white">
-            <div className="text-2xl font-bold">$4.2B+</div>
-            <div className="text-xs text-gray-500 uppercase tracking-wider font-bold">Asset Flow</div>
-          </div>
-        </div>
-      </motion.div>
-
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9, y: 50 }}
-        whileInView={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-        viewport={{ once: true }}
-        className="relative group"
-      >
-        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-3xl blur-3xl opacity-50 group-hover:opacity-70 transition duration-1000"></div>
-        <div className="relative bg-white/5 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
-          <img 
-            src="/static/images/hero-dashboard.png" 
-            alt="Sinjab Dashboard" 
-            className="w-full h-auto object-cover opacity-90 group-hover:scale-[1.02] transition-transform duration-700"
-          />
-          <div className="absolute top-8 right-8 p-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 animate-bounce transition-all duration-1000">
-             <div className="text-[10px] text-gray-400 uppercase font-bold">Live Profit</div>
-             <div className="text-xl font-bold text-green-400">+$2,481.00</div>
-          </div>
-        </div>
-      </motion.div>
+        {/* Stats Grid */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 pt-12 mt-8 border-t border-white/10"
+        >
+          {stats.map((stat, idx) => (
+            <div key={idx} className="text-center p-4">
+              <div className="text-3xl md:text-4xl font-black text-white mb-1">{stat.value}</div>
+              <div className="text-xs md:text-sm text-gray-500 uppercase tracking-wider font-semibold">
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </motion.div>
+      </div>
     </div>
   );
 };
 
+// --- FEEDS / UPDATES MARQUEE ---
 const Feeds = () => {
   const updates = [
-    { title: "Network Upgrade", desc: "Latency reduced by 40ms", color: "blue" },
-    { title: "New Partnership", desc: "Noon integration complete", color: "green" },
-    { title: "System Stability", desc: "99.99% Uptime maintained", color: "purple" },
-    { title: "Global Expansion", desc: "Now active in UAE region", color: "yellow" },
+    { title: 'New Partnership', desc: 'Noon integration complete', color: 'green' },
+    { title: 'Platform Update', desc: 'Split payments now live', color: 'blue' },
+    { title: '99.99% Uptime', desc: 'System reliability maintained', color: 'purple' },
+    { title: 'Expansion', desc: 'Now active in 20+ cities', color: 'yellow' },
+    { title: 'App Update', desc: 'v4.2 released with new features', color: 'blue' },
+    { title: 'Milestone', desc: '250k downloads achieved', color: 'green' },
   ];
 
-  const socialCards = [
-    { image: "https://picsum.photos/seed/feed1/400/400", user: "@sinjab_fintech" },
-    { image: "https://picsum.photos/seed/feed2/400/400", user: "@sinjab_fintech" },
-    { image: "https://picsum.photos/seed/feed3/400/400", user: "@sinjab_fintech" },
-    { image: "https://picsum.photos/seed/feed4/400/400", user: "@sinjab_fintech" },
-  ];
+  const colorMap: Record<string, string> = {
+    green: 'bg-green-500',
+    blue: 'bg-blue-500',
+    purple: 'bg-purple-500',
+    yellow: 'bg-yellow-500',
+  };
 
-  const marqueeItems = [...updates, ...socialCards, ...updates, ...socialCards];
+  const doubledUpdates = [...updates, ...updates];
 
   return (
-    <div className="relative flex whitespace-nowrap overflow-hidden py-10">
-      <motion.div 
-        animate={{ x: [0, -2000] }}
-        transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
-        className="flex gap-8 items-center"
+    <div className="relative flex whitespace-nowrap overflow-hidden py-6">
+      <motion.div
+        animate={{ x: [0, -1500] }}
+        transition={{ repeat: Infinity, duration: 25, ease: 'linear' }}
+        className="flex gap-6 items-center"
       >
-        {marqueeItems.map((item, idx) => (
-          <div key={idx} className="flex-shrink-0">
-            {'title' in item ? (
-              <div className="bg-white/5 backdrop-blur-md px-8 py-6 rounded-2xl border border-white/5 flex items-start gap-4 hover:border-white/20 transition-all cursor-default">
-                <div className={`w-3 h-3 rounded-full mt-1.5 bg-${item.color}-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]`} />
-                <div>
-                  <div className="text-sm font-bold text-white mb-1">{item.title}</div>
-                  <div className="text-xs text-gray-500">{item.desc}</div>
-                </div>
-              </div>
-            ) : (
-              <div className="relative w-48 h-48 rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:scale-105 transition-all">
-                <img src={item.image} alt="Social Feed" className="w-full h-full object-cover opacity-60 hover:opacity-100 transition-opacity" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-4">
-                  <span className="text-[10px] font-bold text-white/50 tracking-widest">{item.user}</span>
-                </div>
-              </div>
-            )}
+        {doubledUpdates.map((item, idx) => (
+          <div
+            key={idx}
+            className="flex-shrink-0 bg-white/5 backdrop-blur-md px-6 py-4 rounded-xl border border-white/5 flex items-start gap-3 hover:border-white/20 transition-all cursor-default"
+          >
+            <div className={`w-2.5 h-2.5 rounded-full mt-1.5 ${colorMap[item.color]} shadow-lg`} />
+            <div>
+              <div className="text-sm font-bold text-white mb-0.5">{item.title}</div>
+              <div className="text-xs text-gray-500">{item.desc}</div>
+            </div>
           </div>
         ))}
       </motion.div>
@@ -184,22 +328,27 @@ const Feeds = () => {
   );
 };
 
+// --- B2B TRUST SECTION ---
 const B2BTrust = () => {
-  const partners = ['Monsha’at', 'Noon', 'Roshn', 'Aramco', 'STC'];
+  const partners = ["Monsha'at", 'Noon', 'Roshn', 'Leejam', 'WeBook'];
 
   return (
-    <div className="container mx-auto px-6">
-      <div className="flex flex-col items-center gap-12">
-        <h3 className="text-gray-500 text-sm font-bold uppercase tracking-[0.2em]">Trusted by Global Industry Leaders</h3>
+    <div className="container mx-auto px-5 md:px-6">
+      <div className="flex flex-col items-center gap-8 md:gap-12">
+        <h3 className="text-gray-500 text-xs md:text-sm font-bold uppercase tracking-[0.15em] text-center">
+          Trusted by Industry Leaders
+        </h3>
         <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-        <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-12 w-full max-w-4xl">
           {partners.map((partner) => (
-            <motion.div 
-              key={partner} 
-              whileHover={{ scale: 1.1, filter: 'grayscale(0%)' }}
-              className="grayscale opacity-30 hover:opacity-100 transition-all duration-500 cursor-pointer"
+            <motion.div
+              key={partner}
+              whileHover={{ scale: 1.05 }}
+              className="flex items-center justify-center p-4 md:p-6 bg-white/[0.02] rounded-xl border border-white/5 hover:border-white/20 transition-all cursor-pointer"
             >
-              <div className="text-2xl md:text-3xl font-black text-white">{partner.toUpperCase()}</div>
+              <div className="text-lg md:text-xl font-bold text-white/60 hover:text-white transition-colors">
+                {partner.toUpperCase()}
+              </div>
             </motion.div>
           ))}
         </div>
@@ -209,142 +358,227 @@ const B2BTrust = () => {
   );
 };
 
+// --- FEATURES GRID ---
 const Features = () => {
+  const features = [
+    {
+      title: 'Smart Bookings',
+      description: 'Prevent double-booking with our real-time centralized calendar.',
+      icon: (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
+        </svg>
+      ),
+      color: 'blue',
+    },
+    {
+      title: 'Player App',
+      description: 'Direct exposure to 250k+ players looking for courts nearby.',
+      icon: (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+          />
+        </svg>
+      ),
+      color: 'green',
+    },
+    {
+      title: 'Split Payments',
+      description: 'Let players split the bill instantly. Automated & hassle-free.',
+      icon: (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+          />
+        </svg>
+      ),
+      color: 'purple',
+    },
+    {
+      title: 'Dynamic Pricing',
+      description: 'Set peak/off-peak rates to maximize revenue.',
+      icon: (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+          />
+        </svg>
+      ),
+      color: 'yellow',
+    },
+  ];
+
+  const colorClasses: Record<string, { bg: string; border: string; text: string }> = {
+    blue: { bg: 'bg-blue-500/20', border: 'border-blue-500/30', text: 'text-blue-400' },
+    green: { bg: 'bg-green-500/20', border: 'border-green-500/30', text: 'text-green-400' },
+    purple: { bg: 'bg-purple-500/20', border: 'border-purple-500/30', text: 'text-purple-400' },
+    yellow: { bg: 'bg-yellow-500/20', border: 'border-yellow-500/30', text: 'text-yellow-400' },
+  };
+
   return (
-    <div className="grid grid-cols-12 gap-4 h-auto md:h-[800px]">
-      <motion.div 
-        whileHover={{ scale: 0.99 }}
-        className="col-span-12 md:col-span-8 row-span-1 bg-white/[0.02] border border-white/5 rounded-3xl p-8 relative overflow-hidden group hover:border-white/20 transition-all"
-      >
-        <div className="z-10 relative space-y-4 max-w-sm">
-          <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 border border-blue-500/30">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </div>
-          <h3 className="text-2xl font-bold text-white">Real-time Analytics Engine</h3>
-          <p className="text-gray-400">Process millions of transactions with sub-second latency. Get insights as they happen.</p>
-        </div>
-        <img src="https://picsum.photos/seed/analytics/600/400" className="absolute bottom-[-10%] right-[-5%] w-2/3 opacity-20 group-hover:opacity-40 transition-opacity rounded-2xl rotate-[-5deg]" alt="feature" />
-      </motion.div>
+    <div className="container mx-auto px-5 md:px-6">
+      <div className="text-center mb-12 md:mb-16">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          Everything Your Club Needs
+        </h2>
+        <p className="text-gray-400 max-w-xl mx-auto">
+          Powerful tools designed specifically for modern sports facility management.
+        </p>
+      </div>
 
-      <motion.div 
-        whileHover={{ scale: 0.99 }}
-        className="col-span-12 md:col-span-4 row-span-1 bg-white/[0.02] border border-white/5 rounded-3xl p-8 flex flex-col justify-between group hover:border-white/20 transition-all"
-      >
-        <div className="space-y-4">
-          <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center text-purple-400 border border-purple-500/30">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8-0v4h8z" />
-            </svg>
-          </div>
-          <h3 className="text-2xl font-bold text-white">Biometric Vault</h3>
-        </div>
-        <div className="space-y-2">
-          <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-             <motion.div initial={{ width: 0 }} whileInView={{ width: '95%' }} transition={{ duration: 2 }} className="h-full bg-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.8)]" />
-          </div>
-          <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Security Level: Enterprise</div>
-        </div>
-      </motion.div>
-
-      <motion.div 
-        whileHover={{ scale: 0.99 }}
-        className="col-span-12 md:col-span-4 row-span-1 bg-white/[0.02] border border-white/5 rounded-3xl p-8 flex flex-col justify-center text-center group hover:border-white/20 transition-all"
-      >
-         <div className="mb-8 relative mx-auto w-32 h-32 flex items-center justify-center">
-            <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 10, ease: "linear" }} className="absolute inset-0 border border-dashed border-white/20 rounded-full" />
-            <div className="text-4xl font-bold text-white">SAR</div>
-         </div>
-         <h3 className="text-2xl font-bold text-white mb-2">Global Liquidity</h3>
-         <p className="text-gray-400 text-sm">Transact in 140+ currencies with institutional-grade FX rates.</p>
-      </motion.div>
-
-      <motion.div 
-        whileHover={{ scale: 0.99 }}
-        className="col-span-12 md:col-span-8 row-span-1 bg-white/[0.02] border border-white/5 rounded-3xl p-8 relative overflow-hidden group hover:border-white/20 transition-all"
-      >
-        <div className="grid grid-cols-2 gap-8 h-full items-center">
-          <div className="space-y-4">
-            <h3 className="text-2xl font-bold text-white">Developer API</h3>
-            <p className="text-gray-400 text-sm leading-relaxed">Restful APIs that developers love. Integrate Sinjab into your workflow in minutes.</p>
-            <div className="flex gap-2">
-              <span className="px-2 py-1 bg-white/5 rounded text-[10px] border border-white/10 font-mono text-gray-400">POST /payment</span>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto">
+        {features.map((feature, idx) => (
+          <motion.div
+            key={idx}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.1 }}
+            viewport={{ once: true }}
+            whileHover={{ scale: 1.02 }}
+            className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 md:p-8 hover:border-white/20 transition-all group"
+          >
+            <div
+              className={`w-12 h-12 ${colorClasses[feature.color].bg} rounded-xl flex items-center justify-center ${colorClasses[feature.color].text} ${colorClasses[feature.color].border} border mb-4 group-hover:scale-110 transition-transform`}
+            >
+              {feature.icon}
             </div>
-          </div>
-          <div className="bg-black/40 rounded-2xl border border-white/10 p-4 font-mono text-[10px] text-blue-300">
-             <pre>{`{
-  "id": "sj_821",
-  "status": "success",
-  "amount": 12500,
-  "node": "central"
-}`}</pre>
-          </div>
-        </div>
-      </motion.div>
+            <h3 className="text-xl font-bold text-white mb-2">{feature.title}</h3>
+            <p className="text-[#E5E7EB] text-sm leading-relaxed">{feature.description}</p>
+          </motion.div>
+        ))}
+      </div>
     </div>
   );
 };
 
+// --- PRICING SECTION ---
 const Pricing = () => {
   const tiers = [
-    { name: 'Starter', price: '99', features: ['5 Business Nodes', 'Real-time Feeds', 'Standard Support'], active: false },
-    { name: 'Growth', price: '299', features: ['25 Business Nodes', 'Advanced API Access', 'Priority Support', 'Custom Branding'], active: true },
-    { name: 'Enterprise', price: 'Custom', features: ['Unlimited Nodes', 'Dedicated Infrastructure', '24/7 Phone Support', 'On-premise Options'], active: false },
+    {
+      name: 'Starter',
+      tagline: 'Commission Only',
+      price: 'Free',
+      priceNote: '+ 15% per booking',
+      features: [
+        'Unlimited bookings',
+        'Player app exposure',
+        'Basic analytics',
+        'Email support',
+      ],
+      active: false,
+      cta: 'Get Started Free',
+    },
+    {
+      name: 'Growth',
+      tagline: 'Subscription + Lower Commission',
+      price: '499',
+      priceNote: 'SAR/mo + 8% per booking',
+      features: [
+        'Everything in Starter',
+        'Dynamic pricing engine',
+        'Split payments',
+        'Advanced analytics',
+        'Priority support',
+        'Custom branding',
+      ],
+      active: true,
+      cta: 'Start Growing',
+    },
   ];
 
   return (
-    <div className="container mx-auto px-6">
-      <div className="text-center mb-16">
-        <h2 className="text-4xl font-bold text-white">Flexible Plans. Precise Value.</h2>
-        <p className="text-gray-500 mt-4">Transparent pricing designed for organizations of all sizes.</p>
+    <div className="container mx-auto px-5 md:px-6">
+      <div className="text-center mb-12 md:mb-16">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          Simple, Transparent Pricing
+        </h2>
+        <p className="text-gray-400 max-w-xl mx-auto">
+          Choose the plan that fits your club&apos;s needs. No hidden fees.
+        </p>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-3xl mx-auto">
         {tiers.map((tier) => (
-          <motion.div 
+          <motion.div
             key={tier.name}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className={`relative p-8 rounded-3xl border transition-all duration-500 group ${
-              tier.active 
-                ? 'bg-white/5 border-blue-500/50 scale-105 shadow-[0_0_40px_rgba(59,130,246,0.1)]' 
+            className={`relative p-6 md:p-8 rounded-2xl md:rounded-3xl border transition-all duration-500 ${
+              tier.active
+                ? 'bg-[#1B5BCC]/10 border-[#1B5BCC]/50 shadow-[0_0_40px_rgba(27,91,204,0.15)]'
                 : 'bg-white/[0.02] border-white/10 hover:border-white/30'
             }`}
           >
             {tier.active && (
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-500 text-[10px] font-black uppercase tracking-widest rounded-full text-white">
-                Most Popular
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#1B5BCC] text-[10px] font-black uppercase tracking-widest rounded-full text-white">
+                Recommended
               </div>
             )}
-            
-            <div className="mb-8">
-              <h4 className="text-gray-400 font-bold uppercase tracking-widest text-xs mb-2">{tier.name}</h4>
+
+            <div className="mb-6">
+              <h4 className="text-gray-400 font-bold uppercase tracking-widest text-xs mb-1">
+                {tier.name}
+              </h4>
+              <p className="text-[#E5E7EB] text-sm mb-4">{tier.tagline}</p>
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-black text-white">${tier.price}</span>
-                {tier.price !== 'Custom' && <span className="text-gray-500 text-sm">/mo</span>}
+                {tier.price === 'Free' ? (
+                  <span className="text-4xl font-black text-white">Free</span>
+                ) : (
+                  <>
+                    <span className="text-4xl font-black text-white">{tier.price}</span>
+                    <span className="text-gray-500 text-sm">SAR</span>
+                  </>
+                )}
               </div>
+              <p className="text-xs text-gray-500 mt-1">{tier.priceNote}</p>
             </div>
-            
-            <ul className="space-y-4 mb-8">
+
+            <ul className="space-y-3 mb-8">
               {tier.features.map((feature) => (
-                <li key={feature} className="flex items-center gap-3 text-sm text-gray-300">
-                  <svg className={`w-5 h-5 ${tier.active ? 'text-blue-500' : 'text-gray-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                <li key={feature} className="flex items-center gap-3 text-sm text-[#E5E7EB]">
+                  <svg
+                    className={`w-5 h-5 flex-shrink-0 ${tier.active ? 'text-[#1B5BCC]' : 'text-gray-600'}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={3}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                   {feature}
                 </li>
               ))}
             </ul>
-            
-            <button className={`w-full py-4 font-bold rounded-xl transition-all ${
-              tier.active 
-                ? 'bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:bg-blue-500' 
-                : 'bg-white/5 border border-white/10 hover:bg-white/10 text-white'
-            }`}>
-              Get Started
+
+            <button
+              className={`w-full py-4 font-bold rounded-xl transition-all min-h-[52px] ${
+                tier.active
+                  ? 'bg-[#1B5BCC] text-white shadow-[0_0_20px_rgba(27,91,204,0.4)] hover:bg-[#1B5BCC]/90'
+                  : 'bg-white/5 border border-white/10 hover:bg-white/10 text-white'
+              }`}
+            >
+              {tier.cta}
             </button>
           </motion.div>
         ))}
@@ -353,40 +587,72 @@ const Pricing = () => {
   );
 };
 
+// --- FAQ SECTION ---
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const faqs = [
-    { q: "How secure is the Sinjab platform?", a: "We utilize AES-256 encryption at rest and TLS 1.3 in transit. Our infrastructure is SOC2 Type II compliant." },
-    { q: "Can I integrate with existing ERP systems?", a: "Yes, Sinjab provides native connectors for SAP, Oracle, NetSuite, and Microsoft Dynamics." },
-    { q: "What regions do you currently support?", a: "We are fully operational across the GCC region, Europe, and North America." },
-    { q: "Is there a limit on transaction volume?", a: "No, our architecture is designed to scale horizontally to millions of transactions." },
+    {
+      q: 'How does Sinjab help my club get more bookings?',
+      a: 'Your club gets listed on our player app with 250k+ active users. Players can discover and book your courts directly, bringing you new customers without any marketing effort.',
+    },
+    {
+      q: 'What payment methods do you support?',
+      a: 'We support all major payment methods including Mada, Visa, Mastercard, Apple Pay, and STC Pay. Players can also split payments among themselves.',
+    },
+    {
+      q: 'Can I set different prices for peak and off-peak hours?',
+      a: 'Yes! Our dynamic pricing engine lets you set custom rates for different time slots, days, and seasons to maximize your revenue.',
+    },
+    {
+      q: 'How quickly can I get started?',
+      a: 'Most clubs are onboarded within 24 hours. Our team handles the setup and training so you can start accepting bookings immediately.',
+    },
   ];
 
   return (
-    <div className="max-w-3xl mx-auto px-6">
-      <h2 className="text-3xl font-bold mb-12 text-center text-white">Frequently Asked Questions</h2>
-      <div className="space-y-4">
+    <div className="max-w-3xl mx-auto px-5 md:px-6">
+      <h2 className="text-3xl md:text-4xl font-bold mb-8 md:mb-12 text-center text-white">
+        Frequently Asked Questions
+      </h2>
+      <div className="space-y-3 md:space-y-4">
         {faqs.map((faq, idx) => (
-          <div key={idx} className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden transition-all duration-300">
-            <button 
-              className="w-full px-8 py-6 flex items-center justify-between hover:bg-white/5 text-white"
+          <div
+            key={idx}
+            className="bg-white/[0.02] border border-white/5 rounded-xl md:rounded-2xl overflow-hidden transition-all duration-300"
+          >
+            <button
+              className="w-full px-5 md:px-8 py-5 md:py-6 flex items-center justify-between hover:bg-white/5 text-white min-h-[56px]"
               onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
             >
-              <span className="font-bold text-left">{faq.q}</span>
-              <svg className={`w-5 h-5 text-gray-500 transition-transform ${openIndex === idx ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <span className="font-bold text-left text-sm md:text-base pr-4">{faq.q}</span>
+              <svg
+                className={`w-5 h-5 text-gray-500 transition-transform flex-shrink-0 ${
+                  openIndex === idx ? 'rotate-180' : ''
+                }`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </button>
             <AnimatePresence>
               {openIndex === idx && (
-                <motion.div 
+                <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  className="px-8 pb-6 border-t border-white/5"
+                  className="px-5 md:px-8 pb-5 md:pb-6 border-t border-white/5"
                 >
-                  <p className="text-gray-400 text-sm mt-4">{faq.a}</p>
+                  <p className="text-[#E5E7EB] text-sm md:text-base mt-4 leading-relaxed">
+                    {faq.a}
+                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -397,32 +663,53 @@ const FAQ = () => {
   );
 };
 
+// --- FOOTER ---
 const Footer = () => (
-  <footer className="py-20 border-t border-white/5">
-    <div className="container mx-auto px-6">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 text-white">
-        <div className="space-y-6">
+  <footer className="py-16 md:py-20 border-t border-white/5">
+    <div className="container mx-auto px-5 md:px-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-12 md:mb-16 text-white">
+        <div className="col-span-2 md:col-span-1 space-y-6">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-blue-500 rounded-sm rotate-45" />
+            <div className="w-8 h-8 bg-[#1B5BCC] rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+            </div>
             <span className="font-bold text-xl tracking-tight">Sinjab</span>
           </div>
-          <p className="text-gray-500 text-sm leading-relaxed">Powering the next generation of financial autonomy globally.</p>
+          <p className="text-gray-500 text-sm leading-relaxed">
+            Powering the future of sports facility management in Saudi Arabia and beyond.
+          </p>
         </div>
-        {['Product', 'Resources', 'Company'].map(group => (
-          <div key={group}>
-            <h5 className="font-bold mb-6 text-sm uppercase tracking-widest text-gray-300">{group}</h5>
-            <ul className="space-y-4 text-sm text-gray-500">
-              <li><a href="#" className="hover:text-white transition-colors">Overview</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+        {[
+          { title: 'Product', links: ['Features', 'Pricing', 'Clubs', 'Players'] },
+          { title: 'Company', links: ['About', 'Careers', 'Press', 'Contact'] },
+          { title: 'Legal', links: ['Terms', 'Privacy', 'Cookies'] },
+        ].map((group) => (
+          <div key={group.title}>
+            <h5 className="font-bold mb-4 md:mb-6 text-xs uppercase tracking-widest text-gray-300">
+              {group.title}
+            </h5>
+            <ul className="space-y-3 text-sm text-gray-500">
+              {group.links.map((link) => (
+                <li key={link}>
+                  <a href="#" className="hover:text-white transition-colors">
+                    {link}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         ))}
       </div>
-      <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-white/5 text-gray-600 text-[10px] uppercase font-bold tracking-[0.2em] gap-8">
-        <div>© {new Date().getFullYear()} Sinjab Fintech Inc. Made in Riyadh.</div>
+      <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-white/5 text-gray-600 text-[10px] uppercase font-bold tracking-[0.15em] gap-6 md:gap-8">
+        <div>© {new Date().getFullYear()} Sinjab. Made with ♥ in Riyadh.</div>
         <div className="flex gap-6">
-          {['Twitter', 'LinkedIn', 'Instagram'].map(s => <a key={s} href="#" className="hover:text-white">{s}</a>)}
+          {['Twitter', 'LinkedIn', 'Instagram'].map((s) => (
+            <a key={s} href="#" className="hover:text-white transition-colors">
+              {s}
+            </a>
+          ))}
         </div>
       </div>
     </div>
@@ -430,67 +717,50 @@ const Footer = () => (
 );
 
 // --- MAIN LANDING PAGE COMPONENT ---
+export default function SinjabLanding() {
+  return (
+    <div
+      className="min-h-screen text-white font-sans selection:bg-[#1B5BCC]/30 overflow-x-hidden"
+      style={{
+        background: `linear-gradient(180deg, ${COLORS.navyDeep} 0%, ${COLORS.black} 50%, ${COLORS.black} 100%)`,
+      }}
+    >
+      {/* Background Effects */}
+      <div className="fixed top-0 left-0 w-full h-[50vh] bg-gradient-to-b from-[#000F80]/30 to-transparent pointer-events-none" />
+      <div className="fixed top-[-20%] right-[-10%] w-[50%] h-[50%] bg-[#1B5BCC]/10 blur-[150px] pointer-events-none rounded-full" />
 
-// ... (Your FAQ component above stays the same) ...
+      <Header />
 
-const SinjabFooter = () => (
-    <footer className="py-20 border-t border-white/5">
-      <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 text-white">
-          <div className="space-y-6">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-blue-500 rounded-sm rotate-45" />
-              <span className="font-bold text-xl tracking-tight">Sinjab</span>
-            </div>
-            <p className="text-gray-500 text-sm leading-relaxed">Powering the next generation of financial autonomy globally.</p>
-          </div>
-          {['Product', 'Resources', 'Company'].map(group => (
-            <div key={group}>
-              <h5 className="font-bold mb-6 text-sm uppercase tracking-widest text-gray-300">{group}</h5>
-              <ul className="space-y-4 text-sm text-gray-500">
-                <li><a href="#" className="hover:text-white transition-colors">Overview</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-              </ul>
-            </div>
-          ))}
-        </div>
-        <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-white/5 text-gray-600 text-[10px] uppercase font-bold tracking-[0.2em] gap-8">
-          <div>© {new Date().getFullYear()} Sinjab Fintech Inc. Made in Riyadh.</div>
-          <div className="flex gap-6">
-            {['Twitter', 'LinkedIn', 'Instagram'].map(s => <a key={s} href="#" className="hover:text-white">{s}</a>)}
-          </div>
-        </div>
-      </div>
-    </footer>
+      <main className="relative z-10">
+        <section id="hero" className="min-h-screen flex items-center">
+          <Hero />
+        </section>
+
+        <section
+          id="feeds"
+          className="py-16 md:py-24 overflow-hidden border-y border-white/5 bg-white/[0.01]"
+        >
+          <Feeds />
+        </section>
+
+        <section id="b2b" className="py-16 md:py-24">
+          <B2BTrust />
+        </section>
+
+        <section id="features" className="py-16 md:py-24">
+          <Features />
+        </section>
+
+        <section id="pricing" className="py-16 md:py-32 bg-white/[0.01] border-y border-white/5">
+          <Pricing />
+        </section>
+
+        <section id="faq" className="py-16 md:py-24">
+          <FAQ />
+        </section>
+      </main>
+
+      <Footer />
+    </div>
   );
-  
-  // --- MAIN LANDING PAGE COMPONENT ---
-  // MAKE SURE THIS IS THE ONLY EXPORT DEFAULT AT THE BOTTOM
-  
-  export default function SinjabLanding() {
-    return (
-      <div className="bg-[#080808] min-h-screen text-white font-sans selection:bg-blue-500/30 overflow-x-hidden">
-        <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-900/10 blur-[120px] pointer-events-none rounded-full" />
-        <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-900/10 blur-[120px] pointer-events-none rounded-full" />
-  
-        <Header />
-        
-        <main className="relative z-10 pt-40 md:pt-60">
-          <section id="hero" className="mb-40"><Hero /></section>
-          <section id="feeds" className="py-24 overflow-hidden border-y border-white/5 bg-white/[0.01] mb-40"><Feeds /></section>
-          <section id="b2b" className="mb-40"><B2BTrust /></section>
-          <section id="features" className="container mx-auto px-6 mb-40"><Features /></section>
-          <section id="pricing" className="py-32 bg-white/[0.01] mb-40 border-y border-white/5"><Pricing /></section>
-          <section id="faq" className="mb-40"><FAQ /></section>
-        </main>
-  
-        <Footer />
-      </div>
-    );
-  }
-  
-  // DELETE ANYTHING AFTER THIS BRACKET "}"
-
-// ... (rest of your code)
-
+}
