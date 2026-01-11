@@ -187,14 +187,114 @@ const Header = () => {
   );
 };
 
+// --- ODOMETER DIGIT COMPONENT ---
+const OdometerDigit = ({ digit, prevDigit }: { digit: string; prevDigit: string }) => {
+  const [direction, setDirection] = useState<'up' | 'down' | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [displayDigit, setDisplayDigit] = useState(digit);
+
+  useEffect(() => {
+    if (digit !== prevDigit && prevDigit !== '') {
+      const currentNum = parseInt(digit) || 0;
+      const prevNum = parseInt(prevDigit) || 0;
+      
+      // Determine direction: increase = slide down, decrease = slide up
+      if (currentNum > prevNum || (prevNum === 9 && currentNum === 0)) {
+        setDirection('down');
+      } else if (currentNum < prevNum || (prevNum === 0 && currentNum === 9)) {
+        setDirection('up');
+      }
+      
+      setIsAnimating(true);
+      
+      // Update display after animation starts
+      const timeout = setTimeout(() => {
+        setDisplayDigit(digit);
+        setIsAnimating(false);
+      }, 300);
+      
+      return () => clearTimeout(timeout);
+    } else {
+      setDisplayDigit(digit);
+    }
+  }, [digit, prevDigit]);
+
+  // Handle comma separately
+  if (digit === ',') {
+    return <span className="text-white font-semibold" style={{ fontFamily: 'ui-monospace, monospace' }}>,</span>;
+  }
+
+  return (
+    <span 
+      className="inline-block overflow-hidden relative"
+      style={{ 
+        width: '0.6em',
+        height: '1.2em',
+        fontFamily: 'ui-monospace, monospace'
+      }}
+    >
+      <span
+        className="absolute inset-0 flex items-center justify-center text-white font-semibold transition-transform duration-300 ease-out"
+        style={{
+          transform: isAnimating
+            ? direction === 'down'
+              ? 'translateY(-100%)'
+              : 'translateY(100%)'
+            : 'translateY(0)',
+        }}
+      >
+        {prevDigit !== '' && prevDigit !== ',' ? prevDigit : displayDigit}
+      </span>
+      <span
+        className="absolute inset-0 flex items-center justify-center text-white font-semibold transition-transform duration-300 ease-out"
+        style={{
+          transform: isAnimating
+            ? 'translateY(0)'
+            : direction === 'down'
+              ? 'translateY(100%)'
+              : 'translateY(-100%)',
+        }}
+      >
+        {displayDigit}
+      </span>
+    </span>
+  );
+};
+
+// --- ODOMETER COUNTER COMPONENT ---
+const OdometerCounter = ({ value }: { value: number }) => {
+  const [prevValue, setPrevValue] = useState(value);
+  const formattedValue = value.toLocaleString().padStart(7, ' '); // "XXX,XXX" format
+  const formattedPrevValue = prevValue.toLocaleString().padStart(7, ' ');
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setPrevValue(value);
+    }, 350);
+    return () => clearTimeout(timeout);
+  }, [value]);
+
+  return (
+    <span className="inline-flex items-center" style={{ fontFamily: 'ui-monospace, monospace' }}>
+      {formattedValue.split('').map((char, idx) => (
+        <OdometerDigit 
+          key={idx} 
+          digit={char} 
+          prevDigit={formattedPrevValue[idx] || ''} 
+        />
+      ))}
+    </span>
+  );
+};
+
 // --- HERO SECTION ---
 const Hero = () => {
-  const [playerCount, setPlayerCount] = useState(120000);
+  const [playerCount, setPlayerCount] = useState(120500);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Random fluctuation between 119,000 and 120,100
-      const newCount = Math.floor(Math.random() * (120100 - 119000 + 1)) + 119000;
+      // Random fluctuation between 120,000 and 121,000
+      const newCount = Math.floor(Math.random() * (121000 - 120000 + 1)) + 120000;
       setPlayerCount(newCount);
     }, 1500);
 
@@ -222,16 +322,9 @@ const Hero = () => {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
           </span>
-          <span className="text-sm text-gray-300">
-            <motion.span 
-              key={playerCount}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="text-white font-semibold inline-block"
-            >
-              {playerCount.toLocaleString()}+
-            </motion.span> players active this month
+          <span className="text-sm text-gray-300 flex items-center gap-1">
+            <OdometerCounter value={playerCount} />
+            <span> players active this month</span>
           </span>
         </motion.div>
 
