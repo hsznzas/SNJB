@@ -69,13 +69,12 @@ const Header = () => {
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}
-          <a href="#hero" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-[#1B5BCC] rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-              </svg>
-            </div>
-            <span className="font-bold text-xl tracking-tight text-white">Sinjab</span>
+          <a href="#hero" className="flex items-center group">
+            <img 
+              src="/Logopluswordmark%20white%20no%20background.svg" 
+              alt="Sinjab" 
+              className="h-8 w-auto group-hover:opacity-90 transition-opacity"
+            />
           </a>
 
           {/* Desktop Navigation */}
@@ -795,13 +794,12 @@ const Footer = () => (
     <div className="container mx-auto px-5 md:px-6">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-12 md:mb-16 text-white">
         <div className="col-span-2 md:col-span-1 space-y-6">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[#1B5BCC] rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-              </svg>
-            </div>
-            <span className="font-bold text-xl tracking-tight">Sinjab</span>
+          <div className="flex items-center">
+            <img 
+              src="/Logopluswordmark%20white%20no%20background.svg" 
+              alt="Sinjab" 
+              className="h-8 w-auto"
+            />
           </div>
           <p className="text-gray-500 text-sm leading-relaxed">
             Powering the future of sports facility management in Saudi Arabia and beyond.
