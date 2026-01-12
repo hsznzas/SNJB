@@ -69,15 +69,15 @@ interface StreamConfig {
 }
 
 const STREAM_CONFIGS: StreamConfig[] = [
-  { id: 'padelCommission', name: 'Padel Commission', color: '#1e40af', defaultBaseValue: 158000, defaultStartDate: '2023-01', hasHistoricalData: true },  // blue-800
-  { id: 'padelSubscription', name: 'Padel Subscription', color: '#3b82f6', defaultBaseValue: 52000, defaultStartDate: '2023-01', hasHistoricalData: true },  // blue-500
+  { id: 'padelCommission', name: 'Padel Commission', color: '#3b82f6', defaultBaseValue: 158000, defaultStartDate: '2023-01', hasHistoricalData: true },  // blue-500
+  { id: 'padelSubscription', name: 'Padel Subscription', color: '#6366f1', defaultBaseValue: 52000, defaultStartDate: '2023-01', hasHistoricalData: true },  // indigo-500
   { id: 'premiumListings', name: 'Premium Listings', color: '#64748b', defaultBaseValue: 18000, defaultStartDate: '2023-01', hasHistoricalData: true },  // slate-500
   { id: 'tennis', name: 'Tennis', color: '#10b981', defaultBaseValue: 15000, defaultStartDate: '2026-03', hasHistoricalData: false },  // emerald-500
-  { id: 'newCategories', name: 'New Categories', color: '#059669', defaultBaseValue: 8000, defaultStartDate: '2026-06', hasHistoricalData: false },  // emerald-600
-  { id: 'tournaments', name: 'Tournaments', color: '#0ea5e9', defaultBaseValue: 25000, defaultStartDate: '2026-04', hasHistoricalData: false },  // sky-500
-  { id: 'matchmaking', name: 'Match Making', color: '#6366f1', defaultBaseValue: 10000, defaultStartDate: '2026-05', hasHistoricalData: false },  // indigo-500
-  { id: 'ecommerce', name: 'E-commerce', color: '#475569', defaultBaseValue: 20000, defaultStartDate: '2026-09', hasHistoricalData: false },  // slate-600
-  { id: 'ads', name: 'Ads', color: '#94a3b8', defaultBaseValue: 8000, defaultStartDate: '2026-07', hasHistoricalData: false },  // slate-400
+  { id: 'newCategories', name: 'New Categories', color: '#f59e0b', defaultBaseValue: 8000, defaultStartDate: '2026-06', hasHistoricalData: false },  // amber-500
+  { id: 'tournaments', name: 'Tournaments', color: '#ec4899', defaultBaseValue: 25000, defaultStartDate: '2026-04', hasHistoricalData: false },  // pink-500
+  { id: 'matchmaking', name: 'Match Making', color: '#8b5cf6', defaultBaseValue: 10000, defaultStartDate: '2026-05', hasHistoricalData: false },  // violet-500
+  { id: 'ecommerce', name: 'E-commerce', color: '#14b8a6', defaultBaseValue: 20000, defaultStartDate: '2026-09', hasHistoricalData: false },  // teal-500
+  { id: 'ads', name: 'Ads', color: '#f97316', defaultBaseValue: 8000, defaultStartDate: '2026-07', hasHistoricalData: false },  // orange-500
   { id: 'b2b', name: 'B2B Revenue', color: '#22c55e', defaultBaseValue: 50000, defaultStartDate: '2026-02', hasHistoricalData: false },  // green-500
 ];
 

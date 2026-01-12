@@ -48,6 +48,11 @@ import {
   Calendar,
   Trophy,
   Globe,
+  Landmark,
+  Gavel,
+  ClipboardCheck,
+  BadgeCheck,
+  CircleDot,
   type LucideIcon
 } from 'lucide-react';
 import { FinancialScenarioPlanner } from '@/components/dashboard/FinancialScenarioPlanner';
@@ -1689,6 +1694,202 @@ export default function InvestorRelations() {
             />
 
             <FinancialScenarioPlanner />
+          </section>
+
+          {/* ========== SECTION 7: CORPORATE GOVERNANCE & LEGAL STRUCTURE ========== */}
+          <section id="governance" className="py-24">
+            <SectionHeader
+              id="governance-header"
+              title="Corporate Governance & Legal Structure"
+              subtitle="Transparent organizational framework ensuring regulatory compliance and investor protection."
+            />
+
+            {/* Two Column Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              
+              {/* Column 1: Governance Diagram */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="bg-white/70 backdrop-blur-sm border border-slate-200 rounded-2xl p-8 hover:shadow-lg hover:border-slate-300 transition-all"
+              >
+                <h3 className="text-lg font-bold text-slate-900 mb-8 flex items-center gap-2">
+                  <GitBranch className="w-5 h-5 text-blue-600" />
+                  Governance Hierarchy
+                </h3>
+
+                <div className="flex flex-col items-center">
+                  {/* Shareholders Assembly - Top Tier */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    className="w-full max-w-xs bg-blue-50 border-2 border-blue-300 rounded-xl p-4 text-center"
+                  >
+                    <Users className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+                    <p className="text-slate-900 font-bold text-sm">Shareholders Assembly</p>
+                    <p className="text-slate-500 text-xs mt-1">Supreme Authority</p>
+                  </motion.div>
+
+                  {/* Vertical Connector */}
+                  <div className="w-0.5 h-8 bg-gradient-to-b from-blue-400 to-blue-300" />
+
+                  {/* President & CEO - Middle Tier */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 }}
+                    className="w-full max-w-xs bg-blue-50 border-2 border-blue-300 rounded-xl p-4 text-center relative"
+                  >
+                    <Crown className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+                    <p className="text-slate-900 font-bold text-sm">President & CEO</p>
+                    <p className="text-blue-600 text-xs mt-1">Hassan Al-Sharif</p>
+                  </motion.div>
+
+                  {/* Horizontal Branch Connector */}
+                  <div className="relative w-full max-w-md h-12 mt-4">
+                    {/* Vertical line down from CEO */}
+                    <div className="absolute left-1/2 -translate-x-1/2 top-0 w-0.5 h-4 bg-slate-300" />
+                    {/* Horizontal line */}
+                    <div className="absolute left-[15%] right-[15%] top-4 h-0.5 bg-slate-300" />
+                    {/* Left vertical down */}
+                    <div className="absolute left-[15%] top-4 w-0.5 h-8 bg-slate-300" />
+                    {/* Right vertical down */}
+                    <div className="absolute right-[15%] top-4 w-0.5 h-8 bg-slate-300" />
+                  </div>
+
+                  {/* Side Branches */}
+                  <div className="flex justify-between w-full max-w-md gap-4">
+                    {/* Legal Counsel */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.2 }}
+                      className="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-3 text-center"
+                    >
+                      <Scale className="w-5 h-5 text-slate-500 mx-auto mb-2" />
+                      <p className="text-slate-700 font-semibold text-xs">Legal Counsel</p>
+                      <p className="text-slate-400 text-[10px] mt-1">MZ Lawyers (Covington)</p>
+                    </motion.div>
+
+                    {/* External Auditor */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.3 }}
+                      className="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-3 text-center"
+                    >
+                      <ClipboardCheck className="w-5 h-5 text-slate-500 mx-auto mb-2" />
+                      <p className="text-slate-700 font-semibold text-xs">External Auditor</p>
+                      <p className="text-slate-400 text-[10px] mt-1">MCPA (Al Hudaithi)</p>
+                    </motion.div>
+                  </div>
+                </div>
+
+                {/* Governance Note */}
+                <div className="mt-8 pt-6 border-t border-slate-200">
+                  <p className="text-slate-400 text-xs text-center">
+                    Governance structure compliant with Saudi Companies Law
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Column 2: Entity Details Card */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="bg-white/70 backdrop-blur-sm border border-slate-200 rounded-2xl p-8 hover:shadow-lg hover:border-slate-300 transition-all"
+              >
+                <h3 className="text-lg font-bold text-slate-900 mb-8 flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-blue-600" />
+                  Entity Details
+                </h3>
+
+                <div className="space-y-5">
+                  {/* Entity Name */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Building2 className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Entity Name</p>
+                      <p className="text-slate-900 font-semibold">Sinjab Fun for Sports Clubs</p>
+                    </div>
+                  </div>
+
+                  {/* Legal Form */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Gavel className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Legal Form</p>
+                      <p className="text-slate-900 font-semibold">Simplified Joint Stock Company (SJSC)</p>
+                      <p className="text-slate-400 text-xs mt-0.5">شركة مساهمة مبسطة</p>
+                    </div>
+                  </div>
+
+                  {/* Headquarters */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Headquarters</p>
+                      <p className="text-slate-900 font-semibold">Riyadh, Saudi Arabia</p>
+                    </div>
+                  </div>
+
+                  {/* Capitalization */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Banknote className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Capitalization</p>
+                      <p className="text-slate-900 font-semibold">10,000 SAR <span className="text-emerald-600 text-xs font-normal">(Fully Paid)</span></p>
+                    </div>
+                  </div>
+
+                  {/* Fiscal Year */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Calendar className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Fiscal Year</p>
+                      <p className="text-slate-900 font-semibold">Jan 1 – Dec 31</p>
+                    </div>
+                  </div>
+
+                  {/* CR Status */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <BadgeCheck className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">CR Status</p>
+                      <p className="text-slate-900 font-semibold flex items-center gap-2">
+                        Active 
+                        <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs">Verified June 2025</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Fine Print */}
+                <div className="mt-8 pt-6 border-t border-slate-200">
+                  <p className="text-slate-400 text-xs text-center">
+                    Source: Articles of Association • Commercial Registration
+                  </p>
+                </div>
+              </motion.div>
+            </div>
           </section>
           
           {/* Footer */}
