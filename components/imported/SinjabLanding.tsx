@@ -884,7 +884,7 @@ const Footer = () => (
         {[
           { title: 'Product', links: ['Features', 'Pricing', 'Clubs', 'Players'] },
           { title: 'Company', links: ['About', 'Careers', 'Press', 'Contact'] },
-          { title: 'Legal', links: ['Terms', 'Privacy', 'Cookies'] },
+          { title: 'Legal', links: ['Terms', 'Privacy', 'Cookies', 'Dashboard'] },
         ].map((group) => (
           <div key={group.title}>
             <h5 className="font-bold mb-4 md:mb-6 text-xs uppercase tracking-widest text-gray-300">
@@ -893,7 +893,10 @@ const Footer = () => (
             <ul className="space-y-3 text-sm text-gray-500">
               {group.links.map((link) => (
                 <li key={link}>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a 
+                    href={link === 'Dashboard' ? '/dashboard' : '#'} 
+                    className="hover:text-white transition-colors"
+                  >
                     {link}
                   </a>
                 </li>
