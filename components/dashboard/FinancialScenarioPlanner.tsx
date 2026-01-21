@@ -44,10 +44,10 @@ const generateMonthlyDates = (): string[] => {
   return dates;
 };
 
-const MONTHLY_DATES = generateMonthlyDates();
+export const MONTHLY_DATES = generateMonthlyDates();
 
 // Stream configuration
-type StreamId = 
+export type StreamId = 
   | 'padelCommission' 
   | 'padelSubscription' 
   | 'premiumListings'
@@ -59,7 +59,7 @@ type StreamId =
   | 'ads'
   | 'b2b';
 
-interface StreamConfig {
+export interface StreamConfig {
   id: StreamId;
   name: string;
   color: string;
@@ -68,7 +68,7 @@ interface StreamConfig {
   hasHistoricalData: boolean;
 }
 
-const STREAM_CONFIGS: StreamConfig[] = [
+export const STREAM_CONFIGS: StreamConfig[] = [
   { id: 'padelCommission', name: 'Padel Commission', color: '#3b82f6', defaultBaseValue: 158000, defaultStartDate: '2023-01', hasHistoricalData: true },  // blue-500
   { id: 'padelSubscription', name: 'Padel Subscription', color: '#6366f1', defaultBaseValue: 52000, defaultStartDate: '2023-01', hasHistoricalData: true },  // indigo-500
   { id: 'premiumListings', name: 'Premium Listings', color: '#64748b', defaultBaseValue: 18000, defaultStartDate: '2023-01', hasHistoricalData: true },  // slate-500
@@ -85,7 +85,7 @@ const STREAM_CONFIGS: StreamConfig[] = [
 // HISTORICAL DATA (2023-2024 ACTUALS)
 // ============================================================================
 
-const HISTORICAL_DATA: Record<StreamId, Record<string, number>> = {
+export const HISTORICAL_DATA: Record<StreamId, Record<string, number>> = {
   padelCommission: {
     '2023-01': 85000, '2023-02': 88000, '2023-03': 92000, '2023-04': 95000,
     '2023-05': 98000, '2023-06': 102000, '2023-07': 108000, '2023-08': 105000,
@@ -120,7 +120,7 @@ const HISTORICAL_DATA: Record<StreamId, Record<string, number>> = {
 };
 
 // Projection data for streams
-const PROJECTION_DATA: Record<StreamId, Record<string, number>> = {
+export const PROJECTION_DATA: Record<StreamId, Record<string, number>> = {
   padelCommission: {
     '2025-01': 118000, '2025-02': 95000, '2025-03': 162000, '2025-04': 142000,
     '2025-05': 150000, '2025-06': 125000, '2025-07': 138000, '2025-08': 145000,

@@ -56,6 +56,7 @@ import {
   type LucideIcon
 } from 'lucide-react';
 import { FinancialScenarioPlanner } from '@/components/dashboard/FinancialScenarioPlanner';
+import { MacroBusinessModel } from '@/components/dashboard/MacroBusinessModel';
 import { 
   DATA_2024, 
   DATA_2025, 
@@ -1694,6 +1695,17 @@ export default function InvestorRelations() {
             />
 
             <FinancialScenarioPlanner />
+
+            {/* Macro Business Model Simulator */}
+            <div className="mt-16">
+              <SectionHeader
+                id="macro-simulator-header"
+                title="Business Model Stress Test"
+                subtitle="Macro-economic levers: Take Rates & B2B Expansion."
+              />
+
+              <MacroBusinessModel />
+            </div>
           </section>
 
           {/* ========== SECTION 7: CORPORATE GOVERNANCE & LEGAL STRUCTURE ========== */}
