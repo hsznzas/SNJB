@@ -57,7 +57,7 @@ const securityHeaders = [
 module.exports = () => {
   const plugins = [withBundleAnalyzer];
   return plugins.reduce((acc, next) => next(acc), {
-    output: 'export',
+    // output: 'export', // Commented out to enable API routes for code-explorer
     reactStrictMode: true,
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     eslint: {

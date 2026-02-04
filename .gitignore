@@ -8,3 +8,6 @@ out/
 .env*.local
 npm-debug.log*
 .vercel
+
+# Code Explorer audit logs (sensitive data)
+data/audit-logs.json
