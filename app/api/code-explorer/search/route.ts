@@ -59,13 +59,14 @@ export async function GET(request: NextRequest) {
       results,
       count: results.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     const query = request.nextUrl.searchParams.get('q') || '';
-    await logSearch(session.sessionId, clientIp, query, false, error.message);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    await logSearch(session.sessionId, clientIp, query, false, errorMessage);
 
     console.error('Search error:', error);
     return NextResponse.json(
-      { error: error.message || 'Search failed' },
+      { error: errorMessage || 'Search failed' },
       { status: 500 },
     );
   }

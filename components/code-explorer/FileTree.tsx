@@ -47,8 +47,9 @@ function TreeNode({ item, level, onFileSelect, selectedPath }: TreeNodeProps) {
       const data = await response.json();
       setChildren(data.items || []);
       setIsExpanded(true);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load directory';
+      setError(errorMessage);
       console.error('Error loading children:', err);
     } finally {
       setIsLoading(false);
@@ -146,8 +147,9 @@ export function FileTree({ onFileSelect, selectedPath }: FileTreeProps) {
       }
       const data = await response.json();
       setRootItems(data.items || []);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load root directory';
+      setError(errorMessage);
       console.error('Error loading root:', err);
     } finally {
       setIsLoading(false);

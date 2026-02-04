@@ -74,8 +74,9 @@ export function SearchBar({ onFileSelect }: SearchBarProps) {
       const data = await response.json();
       setResults(data.results || []);
       setShowResults(true);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Search failed';
+      setError(errorMessage);
       console.error('Search error:', err);
     } finally {
       setIsSearching(false);

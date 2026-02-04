@@ -51,13 +51,14 @@ export async function GET(request: NextRequest) {
       path,
       items,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     const path = request.nextUrl.searchParams.get('path') || '';
-    await logBrowse(session.sessionId, clientIp, path, false, error.message);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    await logBrowse(session.sessionId, clientIp, path, false, errorMessage);
 
     console.error('Browse error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to browse directory' },
+      { error: errorMessage || 'Failed to browse directory' },
       { status: 500 },
     );
   }

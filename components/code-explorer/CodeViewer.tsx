@@ -44,8 +44,9 @@ export function CodeViewer({ filePath }: CodeViewerProps) {
       setHighlightedContent(data.highlightedContent || data.content || '');
       setLanguage(data.language || 'plaintext');
       setTruncated(data.truncated || false);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load file';
+      setError(errorMessage);
       console.error('Error loading file:', err);
     } finally {
       setIsLoading(false);
@@ -68,8 +69,9 @@ export function CodeViewer({ filePath }: CodeViewerProps) {
       setHighlightedContent(data.highlightedContent || data.content || '');
       setLanguage(data.language || 'plaintext');
       setTruncated(false); // Hide warning after loading full file
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load full file';
+      setError(errorMessage);
       console.error('Error loading full file:', err);
     } finally {
       setIsLoadingFull(false);

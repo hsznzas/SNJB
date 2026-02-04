@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
       sessionId,
       message: 'Authentication successful',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Authentication error:', error);
     await logAuthAttempt('error', clientIp, false);
     return NextResponse.json(

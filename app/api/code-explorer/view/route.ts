@@ -129,13 +129,14 @@ export async function GET(request: NextRequest) {
       size,
       truncated: size > 50 * 1024,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     const path = request.nextUrl.searchParams.get('path') || '';
-    await logFileView(session.sessionId, clientIp, path, false, error.message);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    await logFileView(session.sessionId, clientIp, path, false, errorMessage);
 
     console.error('View error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to view file' },
+      { error: errorMessage || 'Failed to view file' },
       { status: 500 },
     );
   }
