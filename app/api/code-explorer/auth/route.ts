@@ -158,6 +158,3 @@ export async function DELETE(request: NextRequest) {
     );
   }
 }
-
-// Export session options for use in other routes
-export { sessionOptions };
