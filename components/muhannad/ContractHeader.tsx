@@ -7,6 +7,8 @@ import { Button } from '@/components/shared/ui/button';
 import { Badge } from '@/components/shared/ui/badge';
 import { Progress } from '@/components/shared/ui/progress';
 import { Alert, AlertDescription } from '@/components/shared/ui/alert';
+import { Switch } from '@/components/shared/ui/switch';
+import { Label } from '@/components/shared/ui/label';
 import {
   Download,
   Upload,
@@ -14,12 +16,22 @@ import {
   AlertTriangle,
   CheckCircle2,
   FileText,
+  BarChart3,
+  Calendar,
 } from 'lucide-react';
 import { getCompletionStats, getOverdueTasks, getUpcomingDeadlines, downloadJSON, formatProgress } from '@/lib/contract-utils';
 import { Separator } from '@/components/shared/ui/separator';
 
 export function ContractHeader() {
-  const { contractData, calculateWeightedProgress, exportData, importData, resetData } = useContract();
+  const {
+    contractData,
+    calculateWeightedProgress,
+    exportData,
+    importData,
+    resetData,
+    toggleProgressBars,
+    toggleDeadlines,
+  } = useContract();
   const [isExporting, setIsExporting] = useState(false);
 
   const overallProgress = calculateWeightedProgress();
@@ -80,32 +92,63 @@ export function ContractHeader() {
       {/* Main Contract Info */}
       <Card>
         <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <FileText className="h-6 w-6 text-primary" />
-                <CardTitle className="text-2xl">{contractData.contractTitle}</CardTitle>
+          <div className="space-y-4">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <CardTitle className="text-2xl font-bold tracking-tight">{contractData.contractTitle}</CardTitle>
+                </div>
+                <CardDescription className="text-base">
+                  <span className="font-bold text-foreground">{contractData.party1}</span>
+                  <span className="mx-2 text-muted-foreground">↔</span>
+                  <span className="font-bold text-foreground">{contractData.party2}</span>
+                </CardDescription>
               </div>
-              <CardDescription>
-                <span className="font-semibold">{contractData.party1}</span>
-                {' ↔ '}
-                <span className="font-semibold">{contractData.party2}</span>
-              </CardDescription>
+
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={handleExport} disabled={isExporting}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleImport}>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleReset}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Reset
+                </Button>
+              </div>
             </div>
 
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={handleExport} disabled={isExporting}>
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleImport}>
-                <Upload className="h-4 w-4 mr-2" />
-                Import
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleReset}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Reset
-              </Button>
+            {/* Toggle Controls */}
+            <div className="flex gap-6 p-3 bg-muted/50 rounded-lg border">
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="show-progress"
+                  checked={contractData.showProgressBars}
+                  onCheckedChange={toggleProgressBars}
+                />
+                <Label htmlFor="show-progress" className="flex items-center gap-2 cursor-pointer font-medium">
+                  <BarChart3 className="h-4 w-4" />
+                  Progress Bars
+                </Label>
+              </div>
+              
+              <Separator orientation="vertical" className="h-6" />
+              
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="show-deadlines"
+                  checked={contractData.showDeadlines}
+                  onCheckedChange={toggleDeadlines}
+                />
+                <Label htmlFor="show-deadlines" className="flex items-center gap-2 cursor-pointer font-medium">
+                  <Calendar className="h-4 w-4" />
+                  Due Dates
+                </Label>
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -114,25 +157,27 @@ export function ContractHeader() {
           {/* Overall Progress */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Overall Contract Progress</span>
-              <span className="text-2xl font-bold text-primary">{formatProgress(overallProgress)}</span>
+              <span className="text-sm font-bold">Overall Contract Progress</span>
+              <span className="text-2xl font-bold">{formatProgress(overallProgress)}</span>
             </div>
-            <Progress value={overallProgress} className="h-3" />
+            <Progress value={overallProgress} className="h-3 bg-muted" />
           </div>
 
           <Separator />
 
           {/* Phase Progress */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {contractData.phases.map((phase) => (
-              <div key={phase.id} className="space-y-2">
+            {contractData.phases.map((phase, idx) => (
+              <div key={phase.id} className="space-y-2 p-3 rounded-lg border bg-card">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{phase.title}</span>
-                  <Badge variant="outline">{phase.weight}% weight</Badge>
+                  <span className="text-sm font-bold">{phase.title}</span>
+                  <Badge variant="secondary" className="font-semibold">
+                    {phase.weight}% weight
+                  </Badge>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Progress value={phase.progress} className="flex-1" />
-                  <span className="text-sm font-semibold min-w-[45px] text-right">
+                  <Progress value={phase.progress} className="flex-1 bg-muted" />
+                  <span className="text-sm font-bold min-w-[45px] text-right">
                     {formatProgress(phase.progress)}
                   </span>
                 </div>
@@ -144,59 +189,59 @@ export function ContractHeader() {
 
           {/* Statistics */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="space-y-1">
-              <div className="text-2xl font-bold">{stats.completedTasks}</div>
-              <div className="text-xs text-muted-foreground">Completed Tasks</div>
+            <div className="space-y-1 p-3 rounded-lg border bg-green-50 dark:bg-green-950/20">
+              <div className="text-2xl font-bold text-green-700 dark:text-green-400">{stats.completedTasks}</div>
+              <div className="text-xs font-semibold text-green-600 dark:text-green-500">Completed Tasks</div>
             </div>
-            <div className="space-y-1">
-              <div className="text-2xl font-bold">{stats.inProgressTasks}</div>
-              <div className="text-xs text-muted-foreground">In Progress</div>
+            <div className="space-y-1 p-3 rounded-lg border bg-blue-50 dark:bg-blue-950/20">
+              <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">{stats.inProgressTasks}</div>
+              <div className="text-xs font-semibold text-blue-600 dark:text-blue-500">In Progress</div>
             </div>
-            <div className="space-y-1">
-              <div className="text-2xl font-bold">{stats.notStartedTasks}</div>
-              <div className="text-xs text-muted-foreground">Not Started</div>
+            <div className="space-y-1 p-3 rounded-lg border bg-slate-50 dark:bg-slate-950/20">
+              <div className="text-2xl font-bold text-slate-700 dark:text-slate-400">{stats.notStartedTasks}</div>
+              <div className="text-xs font-semibold text-slate-600 dark:text-slate-500">Not Started</div>
             </div>
-            <div className="space-y-1">
-              <div className="text-2xl font-bold">{stats.totalTasks}</div>
-              <div className="text-xs text-muted-foreground">Total Tasks</div>
+            <div className="space-y-1 p-3 rounded-lg border bg-purple-50 dark:bg-purple-950/20">
+              <div className="text-2xl font-bold text-purple-700 dark:text-purple-400">{stats.totalTasks}</div>
+              <div className="text-xs font-semibold text-purple-600 dark:text-purple-500">Total Tasks</div>
             </div>
           </div>
 
           {/* Alerts */}
           {overdueTasks.length > 0 && (
-            <Alert variant="destructive">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                <strong>{overdueTasks.length} overdue task{overdueTasks.length !== 1 ? 's' : ''}</strong>
-                {' - '}
-                Updates required every 2 days per contract terms
+            <Alert variant="destructive" className="border-2">
+              <AlertTriangle className="h-5 w-5" />
+              <AlertDescription className="font-semibold">
+                <span className="text-lg">{overdueTasks.length}</span> overdue task{overdueTasks.length !== 1 ? 's' : ''}
+                {' • '}
+                <span className="italic">Updates required every 2 days per contract terms</span>
               </AlertDescription>
             </Alert>
           )}
 
           {upcomingDeadlines.length > 0 && overdueTasks.length === 0 && (
-            <Alert>
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                <strong>{upcomingDeadlines.length} deadline{upcomingDeadlines.length !== 1 ? 's' : ''} approaching</strong>
-                {' - '}
-                within the next 7 days
+            <Alert className="bg-amber-50 dark:bg-amber-950/20 border-amber-300 dark:border-amber-900 border-2">
+              <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-500" />
+              <AlertDescription className="text-amber-900 dark:text-amber-200 font-semibold">
+                <span className="text-lg">{upcomingDeadlines.length}</span> deadline{upcomingDeadlines.length !== 1 ? 's' : ''} approaching
+                {' • '}
+                <span className="italic">within the next 7 days</span>
               </AlertDescription>
             </Alert>
           )}
 
           {overdueTasks.length === 0 && upcomingDeadlines.length === 0 && stats.completedTasks > 0 && (
-            <Alert className="bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-900">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <AlertDescription className="text-green-800 dark:text-green-300">
-                All tasks are on track! No overdue or urgent deadlines.
+            <Alert className="bg-green-50 dark:bg-green-950/20 border-green-300 dark:border-green-900 border-2">
+              <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-500" />
+              <AlertDescription className="text-green-900 dark:text-green-200 font-semibold">
+                ✨ All tasks are on track! No overdue or urgent deadlines.
               </AlertDescription>
             </Alert>
           )}
 
           {/* Last Updated */}
-          <div className="text-xs text-muted-foreground text-right">
-            Last updated: {lastUpdated}
+          <div className="text-xs text-muted-foreground text-right italic">
+            Last updated: <span className="font-semibold">{lastUpdated}</span>
           </div>
         </CardContent>
       </Card>

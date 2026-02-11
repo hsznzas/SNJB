@@ -46,6 +46,8 @@ export interface ContractData {
   party1: string;
   party2: string;
   lastUpdated: string;
+  showProgressBars: boolean;
+  showDeadlines: boolean;
 }
 
 interface ContractContextType {
@@ -57,6 +59,21 @@ interface ContractContextType {
   exportData: () => string;
   importData: (jsonData: string) => void;
   resetData: () => void;
+  toggleProgressBars: () => void;
+  toggleDeadlines: () => void;
+  // CRUD operations
+  addPhase: (phase: Omit<ContractPhase, 'id' | 'progress'>) => void;
+  updatePhase: (phaseId: string, updates: Partial<ContractPhase>) => void;
+  deletePhase: (phaseId: string) => void;
+  addMilestone: (phaseId: string, milestone: Omit<Milestone, 'id' | 'progress'>) => void;
+  updateMilestone: (phaseId: string, milestoneId: string, updates: Partial<Milestone>) => void;
+  deleteMilestone: (phaseId: string, milestoneId: string) => void;
+  addTask: (phaseId: string, milestoneId: string, task: Omit<Task, 'id'>) => void;
+  updateTask: (phaseId: string, milestoneId: string, taskId: string, updates: Partial<Task>) => void;
+  deleteTask: (phaseId: string, milestoneId: string, taskId: string) => void;
+  addSubtask: (phaseId: string, milestoneId: string, taskId: string, subtask: Omit<Subtask, 'id'>) => void;
+  updateSubtask: (phaseId: string, milestoneId: string, taskId: string, subtaskId: string, updates: Partial<Subtask>) => void;
+  deleteSubtask: (phaseId: string, milestoneId: string, taskId: string, subtaskId: string) => void;
 }
 
 const ContractContext = createContext<ContractContextType | undefined>(undefined);
@@ -64,12 +81,20 @@ const ContractContext = createContext<ContractContextType | undefined>(undefined
 const STORAGE_KEY = 'muhannad-contract-data';
 
 // Initial seed data based on the contract
-const getInitialContractData = (): ContractData => ({
-  contractTitle: 'Project Services Agreement',
-  party1: 'Sinjab Fun Company',
-  party2: 'Muhanned Al Tinai',
-  lastUpdated: new Date().toISOString(),
-  phases: [
+const getInitialContractData = (): ContractData => {
+  // Calculate date 8 days from now for next Thursday
+  const nextThursday = new Date();
+  nextThursday.setDate(nextThursday.getDate() + 8);
+  const nextThursdayISO = nextThursday.toISOString().split('T')[0];
+
+  return {
+    contractTitle: 'Project Services Agreement',
+    party1: 'Sinjab Fun Company',
+    party2: 'Muhanned Al Tinai',
+    lastUpdated: new Date().toISOString(),
+    showProgressBars: true,
+    showDeadlines: true,
+    phases: [
     {
       id: 'phase-1',
       title: 'Phase 1: Operational & Talent',
@@ -90,7 +115,7 @@ const getInitialContractData = (): ContractData => ({
               title: 'Hire COO (Saudi)',
               description: 'Source and hire Chief Operating Officer',
               progress: 0,
-              deadline: '2026-02-12',
+              deadline: nextThursdayISO,
               weight: 40,
               subtasks: [
                 {
@@ -130,7 +155,7 @@ const getInitialContractData = (): ContractData => ({
               title: 'Hire Sales Representative (Saudi Male)',
               description: 'Sales team member',
               progress: 0,
-              deadline: '2026-02-12',
+              deadline: nextThursdayISO,
               weight: 20,
               subtasks: [],
             },
@@ -294,7 +319,8 @@ const getInitialContractData = (): ContractData => ({
       ],
     },
   ],
-});
+  };
+};
 
 export function ContractProvider({ children }: { children: ReactNode }) {
   const [contractData, setContractData] = useState<ContractData>(getInitialContractData());
@@ -455,6 +481,243 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     setContractData(getInitialContractData());
   };
 
+  // Toggle functions
+  const toggleProgressBars = () => {
+    setContractData((prev) => ({
+      ...prev,
+      showProgressBars: !prev.showProgressBars,
+      lastUpdated: new Date().toISOString(),
+    }));
+  };
+
+  const toggleDeadlines = () => {
+    setContractData((prev) => ({
+      ...prev,
+      showDeadlines: !prev.showDeadlines,
+      lastUpdated: new Date().toISOString(),
+    }));
+  };
+
+  // CRUD Operations - Phase
+  const addPhase = (phase: Omit<ContractPhase, 'id' | 'progress'>) => {
+    setContractData((prev) => {
+      const newPhase: ContractPhase = {
+        ...phase,
+        id: `phase-${Date.now()}`,
+        progress: 0,
+      };
+      return {
+        ...prev,
+        phases: [...prev.phases, newPhase],
+        lastUpdated: new Date().toISOString(),
+      };
+    });
+  };
+
+  const updatePhase = (phaseId: string, updates: Partial<ContractPhase>) => {
+    setContractData((prev) => {
+      const newData = { ...prev };
+      const phaseIndex = newData.phases.findIndex((p) => p.id === phaseId);
+      if (phaseIndex === -1) return prev;
+
+      newData.phases[phaseIndex] = { ...newData.phases[phaseIndex], ...updates };
+      newData.lastUpdated = new Date().toISOString();
+      return newData;
+    });
+  };
+
+  const deletePhase = (phaseId: string) => {
+    setContractData((prev) => ({
+      ...prev,
+      phases: prev.phases.filter((p) => p.id !== phaseId),
+      lastUpdated: new Date().toISOString(),
+    }));
+  };
+
+  // CRUD Operations - Milestone
+  const addMilestone = (phaseId: string, milestone: Omit<Milestone, 'id' | 'progress'>) => {
+    setContractData((prev) => {
+      const newData = { ...prev };
+      const phase = newData.phases.find((p) => p.id === phaseId);
+      if (!phase) return prev;
+
+      const newMilestone: Milestone = {
+        ...milestone,
+        id: `milestone-${Date.now()}`,
+        progress: 0,
+      };
+      phase.milestones.push(newMilestone);
+      phase.progress = calculatePhaseProgress(phase);
+      newData.lastUpdated = new Date().toISOString();
+      return newData;
+    });
+  };
+
+  const updateMilestone = (phaseId: string, milestoneId: string, updates: Partial<Milestone>) => {
+    setContractData((prev) => {
+      const newData = { ...prev };
+      const phase = newData.phases.find((p) => p.id === phaseId);
+      if (!phase) return prev;
+
+      const milestoneIndex = phase.milestones.findIndex((m) => m.id === milestoneId);
+      if (milestoneIndex === -1) return prev;
+
+      phase.milestones[milestoneIndex] = { ...phase.milestones[milestoneIndex], ...updates };
+      phase.progress = calculatePhaseProgress(phase);
+      newData.lastUpdated = new Date().toISOString();
+      return newData;
+    });
+  };
+
+  const deleteMilestone = (phaseId: string, milestoneId: string) => {
+    setContractData((prev) => {
+      const newData = { ...prev };
+      const phase = newData.phases.find((p) => p.id === phaseId);
+      if (!phase) return prev;
+
+      phase.milestones = phase.milestones.filter((m) => m.id !== milestoneId);
+      phase.progress = calculatePhaseProgress(phase);
+      newData.lastUpdated = new Date().toISOString();
+      return newData;
+    });
+  };
+
+  // CRUD Operations - Task
+  const addTask = (phaseId: string, milestoneId: string, task: Omit<Task, 'id'>) => {
+    setContractData((prev) => {
+      const newData = { ...prev };
+      const phase = newData.phases.find((p) => p.id === phaseId);
+      if (!phase) return prev;
+
+      const milestone = phase.milestones.find((m) => m.id === milestoneId);
+      if (!milestone) return prev;
+
+      const newTask: Task = {
+        ...task,
+        id: `task-${Date.now()}`,
+      };
+      milestone.tasks.push(newTask);
+      milestone.progress = calculateMilestoneProgress(milestone);
+      phase.progress = calculatePhaseProgress(phase);
+      newData.lastUpdated = new Date().toISOString();
+      return newData;
+    });
+  };
+
+  const updateTask = (phaseId: string, milestoneId: string, taskId: string, updates: Partial<Task>) => {
+    setContractData((prev) => {
+      const newData = { ...prev };
+      const phase = newData.phases.find((p) => p.id === phaseId);
+      if (!phase) return prev;
+
+      const milestone = phase.milestones.find((m) => m.id === milestoneId);
+      if (!milestone) return prev;
+
+      const taskIndex = milestone.tasks.findIndex((t) => t.id === taskId);
+      if (taskIndex === -1) return prev;
+
+      milestone.tasks[taskIndex] = { ...milestone.tasks[taskIndex], ...updates };
+      milestone.progress = calculateMilestoneProgress(milestone);
+      phase.progress = calculatePhaseProgress(phase);
+      newData.lastUpdated = new Date().toISOString();
+      return newData;
+    });
+  };
+
+  const deleteTask = (phaseId: string, milestoneId: string, taskId: string) => {
+    setContractData((prev) => {
+      const newData = { ...prev };
+      const phase = newData.phases.find((p) => p.id === phaseId);
+      if (!phase) return prev;
+
+      const milestone = phase.milestones.find((m) => m.id === milestoneId);
+      if (!milestone) return prev;
+
+      milestone.tasks = milestone.tasks.filter((t) => t.id !== taskId);
+      milestone.progress = calculateMilestoneProgress(milestone);
+      phase.progress = calculatePhaseProgress(phase);
+      newData.lastUpdated = new Date().toISOString();
+      return newData;
+    });
+  };
+
+  // CRUD Operations - Subtask
+  const addSubtask = (phaseId: string, milestoneId: string, taskId: string, subtask: Omit<Subtask, 'id'>) => {
+    setContractData((prev) => {
+      const newData = { ...prev };
+      const phase = newData.phases.find((p) => p.id === phaseId);
+      if (!phase) return prev;
+
+      const milestone = phase.milestones.find((m) => m.id === milestoneId);
+      if (!milestone) return prev;
+
+      const task = milestone.tasks.find((t) => t.id === taskId);
+      if (!task) return prev;
+
+      const newSubtask: Subtask = {
+        ...subtask,
+        id: `subtask-${Date.now()}`,
+      };
+      task.subtasks.push(newSubtask);
+      task.progress = calculateTaskProgress(task);
+      milestone.progress = calculateMilestoneProgress(milestone);
+      phase.progress = calculatePhaseProgress(phase);
+      newData.lastUpdated = new Date().toISOString();
+      return newData;
+    });
+  };
+
+  const updateSubtask = (
+    phaseId: string,
+    milestoneId: string,
+    taskId: string,
+    subtaskId: string,
+    updates: Partial<Subtask>
+  ) => {
+    setContractData((prev) => {
+      const newData = { ...prev };
+      const phase = newData.phases.find((p) => p.id === phaseId);
+      if (!phase) return prev;
+
+      const milestone = phase.milestones.find((m) => m.id === milestoneId);
+      if (!milestone) return prev;
+
+      const task = milestone.tasks.find((t) => t.id === taskId);
+      if (!task) return prev;
+
+      const subtaskIndex = task.subtasks.findIndex((s) => s.id === subtaskId);
+      if (subtaskIndex === -1) return prev;
+
+      task.subtasks[subtaskIndex] = { ...task.subtasks[subtaskIndex], ...updates };
+      task.progress = calculateTaskProgress(task);
+      milestone.progress = calculateMilestoneProgress(milestone);
+      phase.progress = calculatePhaseProgress(phase);
+      newData.lastUpdated = new Date().toISOString();
+      return newData;
+    });
+  };
+
+  const deleteSubtask = (phaseId: string, milestoneId: string, taskId: string, subtaskId: string) => {
+    setContractData((prev) => {
+      const newData = { ...prev };
+      const phase = newData.phases.find((p) => p.id === phaseId);
+      if (!phase) return prev;
+
+      const milestone = phase.milestones.find((m) => m.id === milestoneId);
+      if (!milestone) return prev;
+
+      const task = milestone.tasks.find((t) => t.id === taskId);
+      if (!task) return prev;
+
+      task.subtasks = task.subtasks.filter((s) => s.id !== subtaskId);
+      task.progress = calculateTaskProgress(task);
+      milestone.progress = calculateMilestoneProgress(milestone);
+      phase.progress = calculatePhaseProgress(phase);
+      newData.lastUpdated = new Date().toISOString();
+      return newData;
+    });
+  };
+
   const value: ContractContextType = {
     contractData,
     updateTaskProgress,
@@ -464,6 +727,20 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     exportData,
     importData,
     resetData,
+    toggleProgressBars,
+    toggleDeadlines,
+    addPhase,
+    updatePhase,
+    deletePhase,
+    addMilestone,
+    updateMilestone,
+    deleteMilestone,
+    addTask,
+    updateTask,
+    deleteTask,
+    addSubtask,
+    updateSubtask,
+    deleteSubtask,
   };
 
   return <ContractContext.Provider value={value}>{children}</ContractContext.Provider>;

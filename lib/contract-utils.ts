@@ -100,31 +100,31 @@ export function getProgressStatus(progress: number): {
   if (progress >= 100) {
     return {
       status: 'complete',
-      color: 'text-green-600 dark:text-green-500',
-      bgColor: 'bg-green-500',
+      color: 'text-foreground',
+      bgColor: 'bg-foreground',
     };
   }
   
   if (progress >= 67) {
     return {
       status: 'high',
-      color: 'text-green-600 dark:text-green-500',
-      bgColor: 'bg-green-500',
+      color: 'text-foreground',
+      bgColor: 'bg-foreground',
     };
   }
   
   if (progress >= 34) {
     return {
       status: 'medium',
-      color: 'text-yellow-600 dark:text-yellow-500',
-      bgColor: 'bg-yellow-500',
+      color: 'text-muted-foreground',
+      bgColor: 'bg-muted-foreground',
     };
   }
   
   return {
     status: 'low',
-    color: 'text-red-600 dark:text-red-500',
-    bgColor: 'bg-red-500',
+    color: 'text-muted-foreground/70',
+    bgColor: 'bg-muted-foreground/70',
   };
 }
 
