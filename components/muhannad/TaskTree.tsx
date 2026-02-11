@@ -13,6 +13,14 @@ import { ChevronDown, ChevronRight, CheckCircle2, Circle, Target, Edit, Trash2, 
 import { cn } from '@/lib/utils';
 import { formatProgress, getProgressStatus } from '@/lib/contract-utils';
 
+interface EditFormData {
+  title: string;
+  description?: string;
+  deadline?: string;
+  weight?: number;
+  progress?: number;
+}
+
 interface TaskTreeProps {
   phases: ContractPhase[];
 }
@@ -44,13 +52,16 @@ function PhaseNode({ phase }: { phase: ContractPhase }) {
     }
   };
 
-  const handleSaveEdit = (data: any) => {
+  const handleSaveEdit = (data: EditFormData) => {
     updatePhase(phase.id, data);
   };
 
-  const handleAddMilestone = (data: any) => {
+  const handleAddMilestone = (data: EditFormData) => {
     addMilestone(phase.id, {
-      ...data,
+      title: data.title,
+      description: data.description,
+      deadline: data.deadline,
+      weight: data.weight ?? 50,
       tasks: [],
     });
   };
@@ -225,12 +236,17 @@ function TaskNode({
     }
   };
 
-  const handleSaveEdit = (data: any) => {
+  const handleSaveEdit = (data: EditFormData) => {
     updateTask(phaseId, milestoneId, task.id, data);
   };
 
-  const handleAddSubtask = (data: any) => {
-    addSubtask(phaseId, milestoneId, task.id, data);
+  const handleAddSubtask = (data: EditFormData) => {
+    addSubtask(phaseId, milestoneId, task.id, {
+      title: data.title,
+      description: data.description,
+      progress: data.progress ?? 0,
+      deadline: data.deadline,
+    });
   };
 
   return (
@@ -375,7 +391,7 @@ function SubtaskNode({
     }
   };
 
-  const handleSaveEdit = (data: any) => {
+  const handleSaveEdit = (data: EditFormData) => {
     updateSubtask(phaseId, milestoneId, taskId, subtask.id, data);
   };
 
